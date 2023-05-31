@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>끝말 잇기</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style></style>
+  </head>
+
+  <body>
+    <div><span id="order">1</span> 번째 참가자</div>
+    <div>제시어 : <span id="order"></span></div>
+    <input type="text" />
+    <button class="btn">입력</button>
+
+    <!-- <script src="src/index.js"></script>
+    <script src="src/game.js"></script> -->
+    <script>
+      const number = parseInt(prompt("몇명참가"), 10);
+      const $input = document.querySelector("input");
+      $input.addEventListener("input", (a) => {
+        console.log(a.data);
+      });
+
+      const onClick = () => {
+        console.log("aaaa");
+      };
+      document
+        .querySelector("button[class='btn']")
+        .addEventListener("click", onClick);
+    </script>
+  </body>
+</html>
