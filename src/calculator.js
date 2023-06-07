@@ -36,7 +36,7 @@ const onClickOperator = (op) => (event) => {
     operator = op;
     $operator.value = op;
   } else {
-    alert("숫자입력");
+    alert("숫자 입력");
   }
 };
 
