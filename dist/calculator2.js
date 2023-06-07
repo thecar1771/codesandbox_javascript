@@ -117,66 +117,58 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/game.js":[function(require,module,exports) {
-var number = parseInt(prompt("참가자"), 10);
-var $input = document.querySelector("input"); // 입력 field
-var $order = document.querySelector('span[id="order"]'); // 참가자 field
-var $word = document.querySelector('span[id="word"]'); // 제시어 field
-var $listP = document.querySelector("p"); // 제시어 field
-
-var word; // 제시어
-var newWord; // 신규 입력
-var wordArr = new Array(); // 입력 값 저장
-
-$input.addEventListener("input", function (textData) {
-  newWord = textData.target.value; // 신규 입력 저장
-});
-
-var onButtonClick = function onButtonClick() {
-  if (!word) {
-    //제시어가 비어 있을 경우
-    word = newWord;
-    $word.textContent = word; // 제시어 추가
-    wordArr.push(word); // 입력값 저장
-    $input.value = ""; // 입력 field 초기화
-    $input.focus();
-
-    //참가자 순서를 변경
-    var order = parseInt($order.textContent);
-    if (order >= number) {
-      $order.textContent = 1;
-    } else {
-      $order.textContent = order + 1;
-    }
-    //입력 목록
-    $listP.textContent = wordArr.toString();
-  } else {
-    //제시어가 비어 있지 않을 경우
-
-    //단어 끝 부분 비교
-    if (wordArr.slice(-1).toString().slice(-1) === newWord.slice(0, 1)) {
-      //단어 끝 부분이 같을 경우
-      wordArr.push(newWord); // 입력값 저장
-      $input.value = ""; // 입력 field 초기화
-      $input.focus();
-
-      //참가자 순서를 변경
-      var _order = parseInt($order.textContent);
-      if (_order >= number) {
-        $order.textContent = 1;
-      } else {
-        $order.textContent = _order + 1;
-      }
-      //입력 목록
-      $listP.textContent = wordArr.toString();
-    } else {
-      //단어 끝 부분이 다를 경우
-      alert("틀림");
+})({"node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+var bundleURL = null;
+function getBundleURLCached() {
+  if (!bundleURL) {
+    bundleURL = getBundleURL();
+  }
+  return bundleURL;
+}
+function getBundleURL() {
+  // Attempt to find the URL of the current script and use that as the base URL
+  try {
+    throw new Error();
+  } catch (err) {
+    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
+    if (matches) {
+      return getBaseURL(matches[0]);
     }
   }
-};
-document.querySelector("button[class='btn']").addEventListener("click", onButtonClick);
-},{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+  return '/';
+}
+function getBaseURL(url) {
+  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)?\/[^/]+(?:\?.*)?$/, '$1') + '/';
+}
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+},{}],"node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
+var bundle = require('./bundle-url');
+function updateLink(link) {
+  var newLink = link.cloneNode();
+  newLink.onload = function () {
+    link.remove();
+  };
+  newLink.href = link.href.split('?')[0] + '?' + Date.now();
+  link.parentNode.insertBefore(newLink, link.nextSibling);
+}
+var cssTimeout = null;
+function reloadCSS() {
+  if (cssTimeout) {
+    return;
+  }
+  cssTimeout = setTimeout(function () {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
+    for (var i = 0; i < links.length; i++) {
+      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
+        updateLink(links[i]);
+      }
+    }
+    cssTimeout = null;
+  }, 50);
+}
+module.exports = reloadCSS;
+},{"./bundle-url":"node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -201,7 +193,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "37027" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "43077" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
@@ -345,5 +337,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js","src/game.js"], null)
-//# sourceMappingURL=/game.e499fc5e.js.map
+},{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js"], null)
+//# sourceMappingURL=/calculator2.js.map
