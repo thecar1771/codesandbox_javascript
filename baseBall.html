@@ -1,0 +1,53 @@
+<html>
+<header>
+<title>숫자야구</title>
+<meta charset="UTF-8"/>
+</header>
+<body>
+<form>
+    <input type="text" id="input">
+    <button id="btn_check">확인</button>
+</form>
+<div id="log"></div>
+<script>
+  const $input = document.querySelector('input[id="input"]');
+  const $button = document.querySelector('button[id="btn_check"]');
+  const $log = document.querySelector('div[id="log"]');
+  const userState = {
+      'ball' : 0,
+      'strike' : 0,
+      'out' : 0,
+      'homeRun' : 0
+  };
+  
+  
+  const checkSB = (inputData) => {
+      let arrResult = result.split('');
+      let arrInputData = inputData.split('');
+      
+      //strike check
+      arrResult.forEach((result)=>arrInputData.forEach((input)=>{
+          if(result === input) {
+               userState['strike'] += 1;
+          } else {
+              
+          } 
+      }));
+  }
+  
+  let result;
+  
+  //숫자입력
+  while(true){
+     result = prompt();
+     if(!!Number(result)) break;
+     alert("숫자만 입력 가능합니다.");
+  }    
+  
+  $button.addEventListener('click',(e)=>{
+      
+  });
+      
+</script>
+</body>
+</html>
