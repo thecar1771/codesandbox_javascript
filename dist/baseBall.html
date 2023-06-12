@@ -1,1 +1,88 @@
-<html><header> <title>숫자야구</title> <meta charset="UTF-8"> </header><body> <form> <input type="text" id="input"> <button id="btn_check">확인</button> </form> <div id="log"></div> <script>for(var e,t=document.querySelector('input[id="input"]'),r=document.querySelector('button[id="btn_check"]'),o=document.querySelector('div[id="log"]');e=prompt(),!Number(e);)alert("숫자만 입력 가능합니다.");</script> </body></html>
+<html>
+<header>
+<title>숫자야구</title>
+<meta charset="UTF-8">
+</header>
+<body>
+<!-- <form> -->
+    <input type="text" id="input">
+    <button id="btn_check">확인</button>
+<!-- </form> -->
+<div id="result"></div>
+<h3 id="userState">
+<div id="log"></div>
+
+<script>var $input = document.querySelector('input[id="input"]');
+var $button = document.querySelector('button[id="btn_check"]');
+var $log = document.querySelector('div[id="log"]');
+var $result = document.querySelector('div[id="result"]');
+var $userState = document.querySelector('h3[id="userState"]');
+var gameCount = 10;
+var userState = {
+  'ball': 0,
+  'strike': 0,
+  'out': 0,
+  'homeRun': 0,
+  'userGameCount': 0
+};
+var checkSB = function checkSB(inputData) {
+  var arrResult = result.split('');
+  var arrInputData = inputData.split('');
+  var sbCount = 0;
+  //strike and Ball check
+  arrResult.forEach(function (inD, inIndex, inArr) {
+    return arrInputData.some(function (outD, outIndex, outArr) {
+      // data check
+      if (inD === outD) {
+        // index check
+        if (inIndex === outIndex) userState['strike'] += 1;else userState['ball'] += 1;
+        // strike 또는 ball 하나라도 있을 경우 건수를 저장 
+        ++sbCount;
+        return true;
+      }
+    });
+  });
+  return sbCount;
+};
+
+//   let result= prompt();
+
+//숫자입력
+while (true) {
+  result = prompt();
+  if (!!Number(result)) {
+    $result.textContent = result;
+    break;
+  }
+  alert("숫자만 입력 가능합니다.");
+}
+$button.addEventListener('click', function (e) {
+  if (!Number($input.value.toString())) {
+    alert("숫자만 입력 가능합니다.");
+    return;
+  }
+  if (result.length !== $input.value.toString().length) {
+    alert("정답과 자릿수가 일치하지 않습니다.");
+    return;
+  }
+  if (userState['userGameCount'] < gameCount) {
+    if (checkSB($input.value) === 0) ++out;else {
+      if ($input.value.toString().length === parseInt(userState['strike'])) {
+        alert("homeRun!!!!!!!!!!!!!!!!");
+        alert("game clear!");
+        userState['homeRun'] += 1;
+        location.reload();
+      }
+    }
+    var user = "";
+    for (var key in userState) {
+      user += key + ':' + userState[key];
+      user += ',';
+    }
+    $userState.textContent = user;
+    $log.textContent = $input.value.toString();
+    userState['userGameCount'] += 1;
+  }
+});</script>
+</h3></body>
+</html>

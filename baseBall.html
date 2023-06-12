@@ -4,47 +4,98 @@
 <meta charset="UTF-8"/>
 </header>
 <body>
-<form>
+<!-- <form> -->
     <input type="text" id="input">
     <button id="btn_check">확인</button>
-</form>
+<!-- </form> -->
+<div id="result"></div>
+<h3 id="userState"></h5>
 <div id="log"></div>
+
 <script>
   const $input = document.querySelector('input[id="input"]');
   const $button = document.querySelector('button[id="btn_check"]');
-  const $log = document.querySelector('div[id="log"]');
+  const $log = document.querySelector('div[id="log"]');  
+  const $result = document.querySelector('div[id="result"]');
+  const $userState = document.querySelector('h3[id="userState"]');
+  const gameCount = 10;
   const userState = {
       'ball' : 0,
       'strike' : 0,
       'out' : 0,
-      'homeRun' : 0
+      'homeRun' : 0,
+      'userGameCount' : 0
   };
   
   
   const checkSB = (inputData) => {
       let arrResult = result.split('');
       let arrInputData = inputData.split('');
-      
-      //strike check
-      arrResult.forEach((result)=>arrInputData.forEach((input)=>{
-          if(result === input) {
-               userState['strike'] += 1;
-          } else {
+      let sbCount = 0 ;
+      //strike and Ball check
+      arrResult.forEach((inD,inIndex,inArr)=>arrInputData.some((outD,outIndex,outArr)=>{
+          // data check
+          if(inD === outD) {
+              // index check
+              if(inIndex === outIndex) userState['strike'] += 1;
+              else userState['ball'] += 1;
+              // strike 또는 ball 하나라도 있을 경우 건수를 저장 
+              ++sbCount;
               
-          } 
+              return true;
+          }
       }));
+      
+      return sbCount;
   }
   
-  let result;
+//   let result= prompt();
   
   //숫자입력
   while(true){
      result = prompt();
-     if(!!Number(result)) break;
+     if(!!Number(result)) {
+        $result.textContent = result; 
+        break;
+     }
      alert("숫자만 입력 가능합니다.");
   }    
   
   $button.addEventListener('click',(e)=>{
+     
+      if(!Number($input.value.toString())) {
+          alert("숫자만 입력 가능합니다.");
+          return;
+      }
+      
+      if(result.length !== $input.value.toString().length) {
+          alert("정답과 자릿수가 일치하지 않습니다.");
+          return ;
+      } 
+     
+      if (userState['userGameCount'] < gameCount) {
+        
+        if(checkSB($input.value) === 0) ++out; 
+        else {
+            if($input.value.toString().length === parseInt(userState['strike'])) {
+                alert("homeRun!!!!!!!!!!!!!!!!");
+                alert("game clear!");
+                userState['homeRun'] += 1;
+                location.reload();
+            }
+        }  
+        
+        let user = "";
+        for(let key in userState) {
+            user += key +':'+ userState[key];
+            user += ','
+        }
+        
+        $userState.textContent = user;
+        $log.textContent = $input.value.toString();
+        
+        userState['userGameCount'] +=1 ;
+      }
       
   });
       
