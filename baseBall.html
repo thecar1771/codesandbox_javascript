@@ -4,49 +4,156 @@
 <meta charset="UTF-8"/>
 </header>
 <body>
-<form>
+<form id = "main">
     <input type="text" id="input">
     <button id="btn_check">확인</button>
+    <div id="targetNumber"></div>
+    <div id="led"></div>
+    <div id="log"></div>
 </form>
-<div id="log"></div>
 <script>
   const $input = document.querySelector('input[id="input"]');
   const $button = document.querySelector('button[id="btn_check"]');
+  const $targetNumber = document.querySelector('div[id="targetNumber"]');
+  const $led = document.querySelector('div[id="led"]');
   const $log = document.querySelector('div[id="log"]');
+  const gameCount = 10;
   const userState = {
       'ball' : 0,
       'strike' : 0,
       'out' : 0,
-      'homeRun' : 0
+      'homeRun' : 0,
+      'userGameCount' : 1
   };
   
+  const $form = document.querySelector('form[id="main"]');
+  $form.addEventListener('submit',(e)=>{
+    e.preventDefault(); // 기본동작 막기 
+    let inputData = $input.value;
+    if(inputValid(inputData)) {
+          
+          //inputDate 추가
+          $log.textContent += '[ ' + inputData + ' ]';
+          
+          //strike && Ball && homeRun && out 체크
+          checkSB(inputData);
+          
+          //game상태 표시
+          let gameLed = ''
+          for(let key in userState){
+              gameLed +=  '[ '+ key + '::' +userState[key] + ' ]';
+          }
+          $led.textContent = gameLed;
+          
+          //target input check
+          if(userState['homeRun'] === 1 || userState['out'] === 3 || userState['userGameCount'] === gameCount) {
+              
+              let alertMessage = (userState['homeRun'] === 1 ? 'homeRun!!' : (userState['out'] === 3 ? '3out!!' : 'userGameCount 10 limit'));
+              
+              //(userState['homeRun'] === 1 ? alert("homeRun!!!" : alert("3out~~~~~")));
+              alert(alertMessage);
+              alert("게임종료 및 재시작");
+              location.reload();
+          }
+          
+          //userGameCount 증가
+          userState['userGameCount'] += 1;
+      }
+  });
+  
+  let result =''; // targetNumber 저장
+   
   
   const checkSB = (inputData) => {
       let arrResult = result.split('');
       let arrInputData = inputData.split('');
+      let strikeCheck = 0;
+      let ballCheck = 0;
       
-      //strike check
-      arrResult.forEach((result)=>arrInputData.forEach((input)=>{
-          if(result === input) {
+      //strike && Ball check
+      arrResult.forEach((inD,inI,inArr)=>arrInputData.some((outD,outI,outArr)=>{
+          
+          if(inD === outD) {
+            if(inI === outI) {
                userState['strike'] += 1;
-          } else {
-              
-          } 
+               strikeCheck += 1;
+            } else {
+               userState['ball'] += 1; 
+               ballCheck +=1;
+            }     
+            //some 종료 시킴 
+            return true;
+          }
+          
       }));
+      
+      if(strikeCheck === result.toString().length) {
+      //strike 와 result 갯수가 같을 경우 homeRun!
+          userState['homeRun'] = 1;
+      }else if((strikeCheck === 0 && ballCheck === 0) && userState['homeRun'] === 0) {
+      //strike,ball,homeRun 0일경우 out
+          userState['out'] += 1; 
+      }    
   }
   
-  let result;
+  const inputValid = (inputData) => {
+     if(!Number(inputData)) {
+         alert("숫자만 입력 가능합니다.");
+         return false;
+     } 
+     
+     if(result.toString().length !== inputData.toString().length) {
+         alert("target(length::"+ result.toString().length +")과 자릿수가 일치하지 않습니다.");
+         return false;
+     }
+     
+     return true
+  }
   
-  //숫자입력
+  //숫자입력 > math.random 으로 변경
   while(true){
      result = prompt();
-     if(!!Number(result)) break;
+     if(!!Number(result)) {
+         $targetNumber.textContent = '**'+result;
+         break;
+     }
      alert("숫자만 입력 가능합니다.");
   }    
-  
+  /*
   $button.addEventListener('click',(e)=>{
-      
+      let inputData = $input.value;
+      if(inputValid(inputData)) {
+          
+          //inputDate 추가
+          $log.textContent += '[ ' + inputData + ' ]';
+          
+          //strike && Ball && homeRun && out 체크
+          checkSB(inputData);
+          
+          //game상태 표시
+          let gameLed = ''
+          for(let key in userState){
+              gameLed +=  '[ '+ key + '::' +userState[key] + ' ]';
+          }
+          $led.textContent = gameLed;
+          
+          //target input check
+          if(userState['homeRun'] === 1 || userState['out'] === 3 || userState['userGameCount'] === gameCount) {
+              
+              let alertMessage = (userState['homeRun'] === 1 ? 'homeRun!!' : (userState['out'] === 3 ? '3out!!' : 'userGameCount 10 limit'));
+              
+              //(userState['homeRun'] === 1 ? alert("homeRun!!!" : alert("3out~~~~~")));
+              alert(alertMessage);
+              alert("게임종료 및 재시작");
+              location.reload();
+          }
+          
+          //userGameCount 증가
+          userState['userGameCount'] += 1;
+      }
   });
+  */
+  
       
 </script>
 </body>
