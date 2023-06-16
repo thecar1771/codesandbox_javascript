@@ -2,10 +2,10 @@
   "name": "vanilla",
   "version": "1.0.0",
   "description": "JavaScript example starter project",
-  "main": "index.html",
+  "main": "lotto.html",
   "scripts": {
-    "start": "parcel baseBall.html --open",
-    "build": "parcel build baseBall.html"
+    "start": "parcel lotto.html --open",
+    "build": "parcel build lotto.html"
   },
   "dependencies": {
     "parcel-bundler": "^1.6.1"
