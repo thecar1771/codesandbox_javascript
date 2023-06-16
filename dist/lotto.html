@@ -1,1 +1,52 @@
-<html><head><title>Lotto</title><meta charset="euc-kr"><style>.ball{display:inline-block;border:1px solid #000;border-radius:20px;width:40px;height:40px;line-height:49px;font-size:20px;text-align:center;margin-right:20px}</style></head><body> <div id="result">추첨 결과는? </div> <div id="bonus">보너스 : </div> <script>alert("dd");for(var r=Array(45).fill().map(function(r,t){return t+1}),t=[];r.length;){var a=Math.floor(Math.random()*r.length),n=r.splice(a,1),l=n[0];t.push(l)}var e=t.slice(0,6).sort(function(r,t){return r-t}),o=t[6];</script> </body></html>
+<html>
+  <head>
+      <title>Lotto</title>
+      <style>.ball {
+              display : inline-block;
+              border : 1px solid black;
+              border-radius: 20px;
+              width : 40px;
+              height : 40px;
+              line-height : 49px;
+              font-size: 20px;
+              text-align: center;
+              margin-right : 20px;
+          }</style>
+  </head>
+  <body>
+    <div id="result">추첨 결과는? </div>
+    <div id="bonus">보너스 : </div>
+    <script>var candidate = Array(45).fill().map(function (_, i) {
+  return i + 1;
+});
+var shuffle = [];
+while (candidate.length) {
+  var random = Math.floor(Math.random() * candidate.length);
+  var spliceArray = candidate.splice(random, 1);
+  var value = spliceArray[0];
+  shuffle.push(value);
+}
+//localeCompare()
+var winBalls = shuffle.slice(0, 7).sort(function (a, b) {
+  return a - b;
+});
+//const bonus = shuffle[6];
+
+var $result = document.querySelector("#result");
+var $bonus = document.querySelector("#bonus");
+var showball = function showball(num, $parent) {
+  var $ball = document.createElement('div');
+  $ball.className = 'ball';
+  $ball.textContent = winBalls[num];
+  $parent.appendChild($ball);
+};
+var _loop = function _loop(i) {
+  setTimeout(function () {
+    showball(i, i < 6 ? $result : $bonus);
+  }, i * 1000 + 1000);
+};
+for (var i = 0; i < winBalls.length; ++i) {
+  _loop(i);
+}</script>
+  </body>
+</html>
