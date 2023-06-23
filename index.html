@@ -4,13 +4,15 @@
         <meta charset="utf-8"/>
         <style>
             #computer {
-                width: 142;
-                height: 200px;
-            }
+                width: 330px;
+                height: 330px;
+            } 
         </style>
     </head>
     <body>
-        <div  id="computer"></div>
+        <div id="computer"></div>
+        <!-- <div id="computer" style="background:url(./rsp.png) no-repeat 0 0;"></div> -->
+        <!-- <img id="computer" src="./img/rsp.png" alt="이미지" /> -->
         <div>
             <button id="scissors" class="btn">가위</button>
             <button id="rock" class="btn">바위</button>
@@ -18,14 +20,38 @@
         </div>
         <div  id="score">0</div>  
     <script>
-        const $div_computer    = document.querySelector('div[id="computer"]');
+        const $div_computer    = document.querySelector('#computer');
         const $button_scissors = document.querySelector('button[id="scissors"]');
         const $button_rock     = document.querySelector('button[id="rock"]');
         const $button_paper    = document.querySelector('button[id="paper"]');
         const $div_score       = document.querySelector('div[id="score"]');
-        const IMG_URL = './rsp.png'
-        $div_computer.style.background = `url(${IMG_URL}) 0 0`;
-        $div_computer.style.backgroundSize = 'auto 200px';
+        const IMG_URL = "/rsp.0e636357.png";
+        
+        //image 좌표
+        const rspX = {
+            scissors : '0',
+            rock : '-329px',
+            paper : '-658px'
+        }
+        
+        // 0 scissors / -329 rock / 658 paper
+        let computerChoise = rspX.scissors; 
+        setInterval(() =>{
+            
+            $div_computer.style.background = `url(${IMG_URL}) ${computerChoise} 0`;
+            $div_computer.style.backgroundSize = `auto 330px`;
+            
+            switch(computerChoise) {
+                case rspX.scissors : computerChoise = rspX.rock;
+                                     break;
+                case rspX.rock     : computerChoise = rspX.paper;
+                                     break;
+                case rspX.paper    : computerChoise = rspX.scissors;
+                                     break;
+            }
+            
+        },50);
+        
     </script>
     </body>
 </html>
