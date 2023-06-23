@@ -33,20 +33,80 @@ var rspX = {
 
 // 0 scissors / -329 rock / 658 paper
 var computerChoise = rspX.scissors;
-setInterval(function () {
-  $div_computer.style.background = "url(".concat(IMG_URL, ") ").concat(computerChoise, " 0");
-  $div_computer.style.backgroundSize = "auto 330px";
+var computerChoiseNm = 'scissors';
+var changeComputer = function changeComputer() {
   switch (computerChoise) {
     case rspX.scissors:
+      computerChoiseNm = 'rock';
       computerChoise = rspX.rock;
       break;
     case rspX.rock:
+      computerChoiseNm = 'paper';
       computerChoise = rspX.paper;
       break;
     case rspX.paper:
+      computerChoiseNm = 'scissors';
       computerChoise = rspX.scissors;
       break;
   }
-}, 50);</script>
+  $div_computer.style.background = "url(".concat(IMG_URL, ") ").concat(computerChoise, " 0");
+  $div_computer.style.backgroundSize = "auto 330px";
+};
+var myinterval = setInterval(changeComputer, 50);
+
+// click button 
+var clickable = true;
+var clickButton = function clickButton(e) {
+  if (clickable) {
+    //Interval을 멈춤
+    clickable = false;
+    clearInterval(myinterval);
+    //Interval 재수행
+    setTimeout(function () {
+      //점수체크
+      scoreCheck(e.target.id, computerChoiseNm);
+      setTimeout(function () {
+        clickable = true;
+        myinterval = setInterval(changeComputer, 50);
+      }, 1000);
+    }, 10);
+  }
+};
+var scoreCheck = function scoreCheck(myChoise, ComputerChoise) {
+  var arrRock = ['rock', {
+    'scissors': -1,
+    'rock': 0,
+    'paper': 1
+  }];
+  var arrPaper = ['paper', {
+    'rock': -1,
+    'paper': 0,
+    'scissors': 1
+  }];
+  var arrScissors = ['scissors', {
+    'paper': -1,
+    'scissors': 0,
+    'rock': 1
+  }];
+  var arrList = [arrRock, arrPaper, arrScissors];
+  arrList.forEach(function (ele, index, arr) {
+    if (ele[0] === myChoise) {
+      switch (ele[1][myChoise] + ele[1][ComputerChoise]) {
+        case -1:
+          alert("승리");
+          break;
+        case 0:
+          alert("무승부");
+          break;
+        case 1:
+          alert("패배");
+          break;
+      }
+    }
+  });
+};
+$button_scissors.addEventListener('click', clickButton);
+$button_rock.addEventListener('click', clickButton);
+$button_paper.addEventListener('click', clickButton);</script>
     </body>
 </html>
