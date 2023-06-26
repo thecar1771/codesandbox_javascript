@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <title>가위바위보</title>
+        <meta charset="utf-8"/>
+        <style>
+            #computer {
+                width: 330px;
+                height: 330px;
+            } 
+        </style>
+    </head>
+    <body>
+        <div id="computer"></div>
+        <!-- <div id="computer" style="background:url(./rsp.png) no-repeat 0 0;"></div> -->
+        <!-- <img id="computer" src="./img/rsp.png" alt="이미지" /> -->
+        <div>
+            <button id="scissors" class="btn">가위</button>
+            <button id="rock" class="btn">바위</button>
+            <button id="paper" class="btn">보</button>
+        </div>
+        <div  id="score">0</div>  
+    <script>
+        const $div_computer    = document.querySelector('#computer');
+        const $button_scissors = document.querySelector('button[id="scissors"]');
+        const $button_rock     = document.querySelector('button[id="rock"]');
+        const $button_paper    = document.querySelector('button[id="paper"]');
+        const $div_score       = document.querySelector('div[id="score"]');
+        const IMG_URL = "/rsp.0e636357.png";
+        
+        //image 좌표
+        const rspX = {
+            scissors : '0',
+            rock : '-329px',
+            paper : '-658px'
+        }
+        
+        // 0 scissors / -329 rock / 658 paper
+        let computerChoise = rspX.scissors; 
+        let computerChoiseNm = 'scissors'; 
+        const changeComputer = () => {
+            
+            switch(computerChoise) {
+                case rspX.scissors : computerChoiseNm = 'rock';
+                                     computerChoise = rspX.rock;
+                                     break;
+                case rspX.rock     : computerChoiseNm = 'paper';
+                                     computerChoise = rspX.paper;
+                                     break;
+                case rspX.paper    : computerChoiseNm = 'scissors'; 
+                                     computerChoise = rspX.scissors;
+                                     break;
+            }
+            $div_computer.style.background = `url(${IMG_URL}) ${computerChoise} 0`;
+            $div_computer.style.backgroundSize = `auto 330px`;
+        };
+        let myinterval = setInterval(changeComputer,50);
+        
+        // click button 
+        let clickable = true;
+        const clickButton = (e) => {
+            if(clickable){
+                //Interval을 멈춤
+                clickable = false;
+                clearInterval(myinterval);
+                //Interval 재수행
+                setTimeout(()=>{
+                    //점수체크
+                    scoreCheck(e.target.id,computerChoiseNm);
+                    setTimeout(()=>{
+                        clickable = true;
+                        myinterval = setInterval(changeComputer,50);
+                    },1000);
+                },10);
+            }
+        }
+        
+        const scoreCheck = (myChoise,ComputerChoise) => {
+            
+            const arrRock   = ['rock'    ,{ 'scissors' : -1 , 'rock' : 0     , 'paper' : 1   }];
+            const arrPaper  = ['paper'   ,{ 'rock' : -1     , 'paper' : 0    , 'scissors' : 1}];
+            const arrScissors  = ['scissors',{ 'paper' : -1    , 'scissors' : 0 , 'rock' : 1    }];
+            const arrList = [arrRock,arrPaper,arrScissors];
+            
+            arrList.forEach((ele,index,arr)=>{
+                if(ele[0] === myChoise) {
+                    switch(ele[1][myChoise] + ele[1][ComputerChoise]) {
+                        case -1 : alert("승리"); break; 
+                        case 0  : alert("무승부"); break;
+                        case 1  : alert("패배"); break;
+                    }
+                }
+            });
+        }
+        
+        $button_scissors.addEventListener('click',clickButton);
+        $button_rock.addEventListener('click',clickButton);
+        $button_paper.addEventListener('click',clickButton);
+        
+    </script>
+    </body>
+</html>

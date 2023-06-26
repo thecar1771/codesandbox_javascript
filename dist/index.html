@@ -1,112 +1,75 @@
 <html>
     <head>
-        <title>가위바위보</title>
         <meta charset="utf-8">
-        <style>#computer {
-                width: 330px;
-                height: 330px;
+        <style>#screen {
+                width : 300px;
+                height : 200px;
+                text-align : center;
+                user-select: none;
+            }
+            #screen.waiting {
+                background-color : aqua;
+            }
+            #screen.ready {
+                background-color : red;
+                color: white;
+            }
+            #screen.now {
+                background-color : greenyellow;
             }</style>
     </head>
     <body>
-        <div id="computer"></div>
-        <!-- <div id="computer" style="background:url(./rsp.png) no-repeat 0 0;"></div> -->
-        <!-- <img id="computer" src="./img/rsp.png" alt="이미지" /> -->
-        <div>
-            <button id="scissors" class="btn">가위</button>
-            <button id="rock" class="btn">바위</button>
-            <button id="paper" class="btn">보</button>
-        </div>
-        <div id="score">0</div>  
-    <script>var $div_computer = document.querySelector('#computer');
-var $button_scissors = document.querySelector('button[id="scissors"]');
-var $button_rock = document.querySelector('button[id="rock"]');
-var $button_paper = document.querySelector('button[id="paper"]');
-var $div_score = document.querySelector('div[id="score"]');
-var IMG_URL = "/rsp.0e636357.png";
+        <div id="screen" class="waiting">클릭해서 시작</div>
+        <div id="result"></div>
+        <script>var $screen = document.querySelector("#screen");
+var $result = document.querySelector("#result");
+var startTime = 0;
+var endTime = 0;
+var records = [];
+$screen.addEventListener('click', function (e) {
+  /*
+      태크.classList.add('클래스') // 추가
+      태그.classList.replace('기존클래스','수정클래스'); // 수정
+      태그.classList.remove('클래스'); //제거
+  */
 
-//image 좌표
-var rspX = {
-  scissors: '0',
-  rock: '-329px',
-  paper: '-658px'
-};
-
-// 0 scissors / -329 rock / 658 paper
-var computerChoise = rspX.scissors;
-var computerChoiseNm = 'scissors';
-var changeComputer = function changeComputer() {
-  switch (computerChoise) {
-    case rspX.scissors:
-      computerChoiseNm = 'rock';
-      computerChoise = rspX.rock;
-      break;
-    case rspX.rock:
-      computerChoiseNm = 'paper';
-      computerChoise = rspX.paper;
-      break;
-    case rspX.paper:
-      computerChoiseNm = 'scissors';
-      computerChoise = rspX.scissors;
-      break;
-  }
-  $div_computer.style.background = "url(".concat(IMG_URL, ") ").concat(computerChoise, " 0");
-  $div_computer.style.backgroundSize = "auto 330px";
-};
-var myinterval = setInterval(changeComputer, 50);
-
-// click button 
-var clickable = true;
-var clickButton = function clickButton(e) {
-  if (clickable) {
-    //Interval을 멈춤
-    clickable = false;
-    clearInterval(myinterval);
-    //Interval 재수행
-    setTimeout(function () {
-      //점수체크
-      scoreCheck(e.target.id, computerChoiseNm);
+  switch (e.target.classList[0]) {
+    case "waiting":
+      //$screen.className = "ready";
+      $screen.classList.replace("waiting", "ready");
+      $screen.textContent = "초록색이 되면 클릭";
       setTimeout(function () {
-        clickable = true;
-        myinterval = setInterval(changeComputer, 50);
-      }, 1000);
-    }, 10);
+        //시작시간
+        startTime = new Date();
+        $screen.classList.replace("ready", "now");
+        $screen.textContent = "클릭하세요.";
+
+        //시간 체크 시작
+      }, Math.floor(Math.random() * 1000) + 2000);
+      break;
+    case "ready":
+      //ready 일때 클릭할 경우 패널티 부여
+      break;
+    case "now":
+      //종료시간
+      endTime = new Date();
+
+      //차이
+      var currentTime = endTime - startTime;
+      records.push(currentTime);
+      $result.textContent = "".concat(currentTime, "ms average::").concat(Math.floor(records.reduce(function (accumulate, e) {
+        return accumulate + e;
+      }) / records.length));
+
+      //변수초기화
+      startTime = null;
+      endTime = null;
+
+      //시간 체크 종료
+      $screen.classList.replace("now", "waiting");
+      $screen.textContent = "초록색이 되면 클릭";
+      break;
   }
-};
-var scoreCheck = function scoreCheck(myChoise, ComputerChoise) {
-  var arrRock = ['rock', {
-    'scissors': -1,
-    'rock': 0,
-    'paper': 1
-  }];
-  var arrPaper = ['paper', {
-    'rock': -1,
-    'paper': 0,
-    'scissors': 1
-  }];
-  var arrScissors = ['scissors', {
-    'paper': -1,
-    'scissors': 0,
-    'rock': 1
-  }];
-  var arrList = [arrRock, arrPaper, arrScissors];
-  arrList.forEach(function (ele, index, arr) {
-    if (ele[0] === myChoise) {
-      switch (ele[1][myChoise] + ele[1][ComputerChoise]) {
-        case -1:
-          alert("승리");
-          break;
-        case 0:
-          alert("무승부");
-          break;
-        case 1:
-          alert("패배");
-          break;
-      }
-    }
-  });
-};
-$button_scissors.addEventListener('click', clickButton);
-$button_rock.addEventListener('click', clickButton);
-$button_paper.addEventListener('click', clickButton);</script>
+});</script>
     </body>
 </html>
