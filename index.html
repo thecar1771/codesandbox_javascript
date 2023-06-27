@@ -1,101 +1,84 @@
 <html>
     <head>
-        <title>가위바위보</title>
-        <meta charset="utf-8"/>
+        <meta charset='utf-8'/>
         <style>
-            #computer {
-                width: 330px;
-                height: 330px;
-            } 
+            #screen {
+                width : 300px;
+                height : 200px;
+                text-align : center;
+                user-select: none;
+            }
+            #screen.waiting {
+                background-color : aqua;
+            }
+            #screen.ready {
+                background-color : red;
+                color: white;
+            }
+            #screen.now {
+                background-color : greenyellow;
+            }
         </style>
     </head>
     <body>
-        <div id="computer"></div>
-        <!-- <div id="computer" style="background:url(./rsp.png) no-repeat 0 0;"></div> -->
-        <!-- <img id="computer" src="./img/rsp.png" alt="이미지" /> -->
-        <div>
-            <button id="scissors" class="btn">가위</button>
-            <button id="rock" class="btn">바위</button>
-            <button id="paper" class="btn">보</button>
-        </div>
-        <div  id="score">0</div>  
-    <script>
-        const $div_computer    = document.querySelector('#computer');
-        const $button_scissors = document.querySelector('button[id="scissors"]');
-        const $button_rock     = document.querySelector('button[id="rock"]');
-        const $button_paper    = document.querySelector('button[id="paper"]');
-        const $div_score       = document.querySelector('div[id="score"]');
-        const IMG_URL = "/rsp.0e636357.png";
-        
-        //image 좌표
-        const rspX = {
-            scissors : '0',
-            rock : '-329px',
-            paper : '-658px'
-        }
-        
-        // 0 scissors / -329 rock / 658 paper
-        let computerChoise = rspX.scissors; 
-        let computerChoiseNm = 'scissors'; 
-        const changeComputer = () => {
+        <div id="screen" class="waiting">클릭해서 시작</div>
+        <div id="result"></div>
+        <script>
+            const $screen = document.querySelector("#screen");
+            const $result = document.querySelector("#result");
             
-            switch(computerChoise) {
-                case rspX.scissors : computerChoiseNm = 'rock';
-                                     computerChoise = rspX.rock;
-                                     break;
-                case rspX.rock     : computerChoiseNm = 'paper';
-                                     computerChoise = rspX.paper;
-                                     break;
-                case rspX.paper    : computerChoiseNm = 'scissors'; 
-                                     computerChoise = rspX.scissors;
-                                     break;
-            }
-            $div_computer.style.background = `url(${IMG_URL}) ${computerChoise} 0`;
-            $div_computer.style.backgroundSize = `auto 330px`;
-        };
-        let myinterval = setInterval(changeComputer,50);
-        
-        // click button 
-        let clickable = true;
-        const clickButton = (e) => {
-            if(clickable){
-                //Interval을 멈춤
-                clickable = false;
-                clearInterval(myinterval);
-                //Interval 재수행
-                setTimeout(()=>{
-                    //점수체크
-                    scoreCheck(e.target.id,computerChoiseNm);
-                    setTimeout(()=>{
-                        clickable = true;
-                        myinterval = setInterval(changeComputer,50);
-                    },1000);
-                },10);
-            }
-        }
-        
-        const scoreCheck = (myChoise,ComputerChoise) => {
+            let startTime = 0;
+            let endTime = 0;
+            let records = [];
             
-            const arrRock   = ['rock'    ,{ 'scissors' : -1 , 'rock' : 0     , 'paper' : 1   }];
-            const arrPaper  = ['paper'   ,{ 'rock' : -1     , 'paper' : 0    , 'scissors' : 1}];
-            const arrScissors  = ['scissors',{ 'paper' : -1    , 'scissors' : 0 , 'rock' : 1    }];
-            const arrList = [arrRock,arrPaper,arrScissors];
-            
-            arrList.forEach((ele,index,arr)=>{
-                if(ele[0] === myChoise) {
-                    switch(ele[1][myChoise] + ele[1][ComputerChoise]) {
-                        case -1 : alert("승리"); break; 
-                        case 0  : alert("무승부"); break;
-                        case 1  : alert("패배"); break;
-                    }
+            $screen.addEventListener('click',(e)=>{
+                
+                /*
+                    태크.classList.add('클래스') // 추가
+                    태그.classList.replace('기존클래스','수정클래스'); // 수정
+                    태그.classList.remove('클래스'); //제거
+                */
+                
+                switch(e.target.classList[0]) {
+                    case "waiting" :
+                      //$screen.className = "ready";
+                      $screen.classList.replace("waiting","ready");
+                      $screen.textContent = "초록색이 되면 클릭"
+                      
+                      setTimeout(()=>{
+                         //시작시간
+                         startTime = new Date();
+                         
+                         $screen.classList.replace("ready","now");
+                         $screen.textContent = "클릭하세요.";
+                         
+                         //시간 체크 시작
+                      },Math.floor(Math.random() * 1000 ) + 2000);
+                      
+                      break;
+                    case "ready" :
+                      //ready 일때 클릭할 경우 패널티 부여
+                      break;
+                    case "now" :
+                      //종료시간
+                      endTime = new Date();
+                      
+                      //차이
+                      const currentTime = endTime - startTime;
+                      records.push(currentTime);
+                      $result.textContent = `${currentTime}ms average::${Math.floor(records.reduce((accumulate,e)=>accumulate+e) / records.length)}`;
+                      
+                      //변수초기화
+                      startTime = null;
+                      endTime = null;
+                      
+                      //시간 체크 종료
+                      $screen.classList.replace("now","waiting");
+                      $screen.textContent = "초록색이 되면 클릭"
+                      
+                      break;
                 }
             });
-        }
-        
-        $button_scissors.addEventListener('click',clickButton);
-        $button_rock.addEventListener('click',clickButton);
-        $button_paper.addEventListener('click',clickButton);
-        
-    </script>
+        </script>
     </body>
 </html>
