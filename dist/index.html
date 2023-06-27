@@ -26,19 +26,19 @@ var $result = document.querySelector("#result");
 var startTime = 0;
 var endTime = 0;
 var records = [];
+var timeOut;
 $screen.addEventListener('click', function (e) {
   /*
       태크.classList.add('클래스') // 추가
       태그.classList.replace('기존클래스','수정클래스'); // 수정
       태그.classList.remove('클래스'); //제거
   */
-
   switch (e.target.classList[0]) {
     case "waiting":
       //$screen.className = "ready";
       $screen.classList.replace("waiting", "ready");
       $screen.textContent = "초록색이 되면 클릭";
-      setTimeout(function () {
+      timeOut = setTimeout(function () {
         //시작시간
         startTime = new Date();
         $screen.classList.replace("ready", "now");
@@ -48,7 +48,9 @@ $screen.addEventListener('click', function (e) {
       }, Math.floor(Math.random() * 1000) + 2000);
       break;
     case "ready":
-      //ready 일때 클릭할 경우 패널티 부여
+      clearTimeout(timeOut);
+      $screen.classList.replace("ready", "waiting");
+      $screen.textContent = "성급하군요 => 클릭해서 재시작";
       break;
     case "now":
       //종료시간
@@ -60,6 +62,14 @@ $screen.addEventListener('click', function (e) {
       $result.textContent = "".concat(currentTime, "ms average::").concat(Math.floor(records.reduce(function (accumulate, e) {
         return accumulate + e;
       }) / records.length));
+      var sortRecords = records.slice();
+      sortRecords.sort(function (a, b) {
+        return a - b;
+      }).forEach(function (e, i, arr) {
+        if (i < 5) {
+          $result.append(document.createElement('br'), "".concat(i + 1, "\uC704 :: ").concat(e, "ms "));
+        }
+      });
 
       //변수초기화
       startTime = null;
@@ -67,7 +77,7 @@ $screen.addEventListener('click', function (e) {
 
       //시간 체크 종료
       $screen.classList.replace("now", "waiting");
-      $screen.textContent = "초록색이 되면 클릭";
+      $screen.textContent = "클릭하세요";
       break;
   }
 });</script>

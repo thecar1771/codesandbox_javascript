@@ -30,6 +30,7 @@
             let startTime = 0;
             let endTime = 0;
             let records = [];
+            let timeOut;
             
             $screen.addEventListener('click',(e)=>{
                 
@@ -38,14 +39,13 @@
                     태그.classList.replace('기존클래스','수정클래스'); // 수정
                     태그.classList.remove('클래스'); //제거
                 */
-                
                 switch(e.target.classList[0]) {
                     case "waiting" :
                       //$screen.className = "ready";
                       $screen.classList.replace("waiting","ready");
                       $screen.textContent = "초록색이 되면 클릭"
                       
-                      setTimeout(()=>{
+                      timeOut = setTimeout(()=>{
                          //시작시간
                          startTime = new Date();
                          
@@ -57,7 +57,10 @@
                       
                       break;
                     case "ready" :
-                      //ready 일때 클릭할 경우 패널티 부여
+                      clearTimeout(timeOut);
+                      $screen.classList.replace("ready","waiting");
+                      $screen.textContent = "성급하군요 => 클릭해서 재시작";
+                      
                       break;
                     case "now" :
                       //종료시간
@@ -68,13 +71,20 @@
                       records.push(currentTime);
                       $result.textContent = `${currentTime}ms average::${Math.floor(records.reduce((accumulate,e)=>accumulate+e) / records.length)}`;
                       
+                      let sortRecords = records.slice();
+                      sortRecords.sort((a,b) => a-b).forEach((e,i,arr)=>{
+                          if(i < 5) {
+                               $result.append(document.createElement('br'),`${i+1}위 :: ${e}ms `);
+                          }
+                      })
+                      
                       //변수초기화
                       startTime = null;
                       endTime = null;
                       
                       //시간 체크 종료
                       $screen.classList.replace("now","waiting");
-                      $screen.textContent = "초록색이 되면 클릭"
+                      $screen.textContent = "클릭하세요"
                       
                       break;
                 }
