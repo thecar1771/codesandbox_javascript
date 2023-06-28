@@ -1,85 +1,46 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <style>#screen {
-                width : 300px;
-                height : 200px;
-                text-align : center;
-                user-select: none;
+        <style>table {
+                border-collapse : collapse;
             }
-            #screen.waiting {
-                background-color : aqua;
-            }
-            #screen.ready {
-                background-color : red;
-                color: white;
-            }
-            #screen.now {
-                background-color : greenyellow;
+            
+            td {
+                border: 1px solid black;
+                width : 40px;
+                height : 40px;
+                text-align: center;
             }</style>
     </head>
     <body>
-        <div id="screen" class="waiting">클릭해서 시작</div>
-        <div id="result"></div>
-        <script>var $screen = document.querySelector("#screen");
-var $result = document.querySelector("#result");
-var startTime = 0;
-var endTime = 0;
-var records = [];
-var timeOut;
-$screen.addEventListener('click', function (e) {
-  /*
-      태크.classList.add('클래스') // 추가
-      태그.classList.replace('기존클래스','수정클래스'); // 수정
-      태그.classList.remove('클래스'); //제거
-  */
-  switch (e.target.classList[0]) {
-    case "waiting":
-      //$screen.className = "ready";
-      $screen.classList.replace("waiting", "ready");
-      $screen.textContent = "초록색이 되면 클릭";
-      timeOut = setTimeout(function () {
-        //시작시간
-        startTime = new Date();
-        $screen.classList.replace("ready", "now");
-        $screen.textContent = "클릭하세요.";
+        <script>var data = Array(3).fill().map(function (e, i) {
+  return Array(3).fill();
+});
+var $table = document.createElement('table');
+var turn = 'O';
+//데이터 갯수 만큼 테이블에 tr td 생성
+data.forEach(function (e, i) {
+  var $tr = document.createElement('tr');
+  //tr tag 밑에 td 추가
+  e.forEach(function (e1, i1) {
+    var $td = document.createElement('td');
+    $td.id = "".concat(i, "_").concat(i1);
+    $td.addEventListener('click', function (e) {
+      if (!e.target.textContent) {
+        var x = e.target.id.split('_')[0];
+        var y = e.target.id.split('_')[0];
 
-        //시간 체크 시작
-      }, Math.floor(Math.random() * 1000) + 2000);
-      break;
-    case "ready":
-      clearTimeout(timeOut);
-      $screen.classList.replace("ready", "waiting");
-      $screen.textContent = "성급하군요 => 클릭해서 재시작";
-      break;
-    case "now":
-      //종료시간
-      endTime = new Date();
-
-      //차이
-      var currentTime = endTime - startTime;
-      records.push(currentTime);
-      $result.textContent = "".concat(currentTime, "ms average::").concat(Math.floor(records.reduce(function (accumulate, e) {
-        return accumulate + e;
-      }) / records.length));
-      var sortRecords = records.slice();
-      sortRecords.sort(function (a, b) {
-        return a - b;
-      }).forEach(function (e, i, arr) {
-        if (i < 5) {
-          $result.append(document.createElement('br'), "".concat(i + 1, "\uC704 :: ").concat(e, "ms "));
-        }
-      });
-
-      //변수초기화
-      startTime = null;
-      endTime = null;
-
-      //시간 체크 종료
-      $screen.classList.replace("now", "waiting");
-      $screen.textContent = "클릭하세요";
-      break;
-  }
-});</script>
+        //변수에 데이터저장
+        data[x][y] = turn;
+        $td.textContent = data[x][y];
+      }
+    });
+    $tr.append($td);
+  });
+  // table 안에 tag 추가
+  $table.append($tr);
+});
+//마지막에 table을 바디에 추가
+document.body.append($table);</script>
     </body>
 </html>
