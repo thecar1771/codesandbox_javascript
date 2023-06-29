@@ -21,7 +21,48 @@
                             return Array(3).fill()
                          });
           const $table = document.createElement('table');
-          let turn = 'O'
+          
+          const humanChoice = (x,y) => {
+            data[x][y] = 'O';
+            document.querySelector(`td[id="${x+'_'+y}"]`).textContent = data[x][y];
+          };
+          
+          const autoComputerChoice = () => {
+            let tempX;
+            let tempY;
+            let nullCheck = data.filter((e,i)=>{
+                return e.some((ie)=>!ie);
+            });
+            
+            //컴퓨터 초이스
+            while(nullCheck.length > 0) {
+                tempX = Math.floor(Math.random() * 3);
+                tempY = Math.floor(Math.random() * 3);
+                    
+                if(!data[tempX][tempY]) {
+                    data[tempX][tempY] = 'X';
+                    document.querySelector(`td[id="${tempX+'_'+tempY}"]`).textContent = data[tempX][tempY];
+                    break;
+                };
+            }     
+          };
+          
+          const tdChoice = (turnGubn,x,y) => {
+              
+              if(turnGubn === "H") {
+                  humanChoice(x,y)
+              } else if(turnGubn === "C"){
+                  autoComputerChoice();
+              }
+              
+             //승부 체크
+ 
+          };
+          
+          function winCheck(){
+              da
+          }
+          
           //데이터 갯수 만큼 테이블에 tr td 생성
           data.forEach((e,i)=>{
               const $tr = document.createElement('tr');
@@ -32,24 +73,13 @@
                 $td.addEventListener('click',(e)=>{
                     if(!e.target.textContent) {
                         const x = e.target.id.split('_')[0];
-                        const y = e.target.id.split('_')[0];
-                        const tempX;
-                        const tempY;
+                        const y = e.target.id.split('_')[1];
                         
-                        //변수에 데이터저장
-                        data[x][y] = turn;
-                        $td.textContent = data[x][y];
-                        
-                        //컴퓨터 초이스
-                        while(true) {
-                            const tempX = Math.floor(Math.random() * 3);
-                            const tempY = Math.floor(Math.random() * 3);
-                            
-                            if(x !== tempX && y !== tempY) break;
-                        }
-                        data[tempX][tempY] = 'X';
-                        
-                        
+                        //사람 초이스 데이터저장
+                        tdChoice("H",x,y);
+                        tdChoice("C");
+                        //승부 체크                         
+ 
                     }
                 });
                 $tr.append($td);    
