@@ -1,94 +1,65 @@
 <html>
     <head>
-        <meta charset='utf-8'/>
+        <meta charset="utf-8">
         <style>
-            #screen {
-                width : 300px;
-                height : 200px;
-                text-align : center;
-                user-select: none;
+            table {
+                border-collapse : collapse;
             }
-            #screen.waiting {
-                background-color : aqua;
-            }
-            #screen.ready {
-                background-color : red;
-                color: white;
-            }
-            #screen.now {
-                background-color : greenyellow;
+            
+            td {
+                border: 1px solid black;
+                width : 40px;
+                height : 40px;
+                text-align: center;
             }
         </style>
     </head>
     <body>
-        <div id="screen" class="waiting">클릭해서 시작</div>
-        <div id="result"></div>
         <script>
-            const $screen = document.querySelector("#screen");
-            const $result = document.querySelector("#result");
-            
-            let startTime = 0;
-            let endTime = 0;
-            let records = [];
-            let timeOut;
-            
-            $screen.addEventListener('click',(e)=>{
-                
-                /*
-                    태크.classList.add('클래스') // 추가
-                    태그.classList.replace('기존클래스','수정클래스'); // 수정
-                    태그.classList.remove('클래스'); //제거
-                */
-                switch(e.target.classList[0]) {
-                    case "waiting" :
-                      //$screen.className = "ready";
-                      $screen.classList.replace("waiting","ready");
-                      $screen.textContent = "초록색이 되면 클릭"
-                      
-                      timeOut = setTimeout(()=>{
-                         //시작시간
-                         startTime = new Date();
-                         
-                         $screen.classList.replace("ready","now");
-                         $screen.textContent = "클릭하세요.";
-                         
-                         //시간 체크 시작
-                      },Math.floor(Math.random() * 1000 ) + 2000);
-                      
-                      break;
-                    case "ready" :
-                      clearTimeout(timeOut);
-                      $screen.classList.replace("ready","waiting");
-                      $screen.textContent = "성급하군요 => 클릭해서 재시작";
-                      
-                      break;
-                    case "now" :
-                      //종료시간
-                      endTime = new Date();
-                      
-                      //차이
-                      const currentTime = endTime - startTime;
-                      records.push(currentTime);
-                      $result.textContent = `${currentTime}ms average::${Math.floor(records.reduce((accumulate,e)=>accumulate+e) / records.length)}`;
-                      
-                      let sortRecords = records.slice();
-                      sortRecords.sort((a,b) => a-b).forEach((e,i,arr)=>{
-                          if(i < 5) {
-                               $result.append(document.createElement('br'),`${i+1}위 :: ${e}ms `);
-                          }
-                      })
-                      
-                      //변수초기화
-                      startTime = null;
-                      endTime = null;
-                      
-                      //시간 체크 종료
-                      $screen.classList.replace("now","waiting");
-                      $screen.textContent = "클릭하세요"
-                      
-                      break;
-                }
-            });
+          const data = Array(3).fill()
+                         .map((e,i)=>{
+                            return Array(3).fill()
+                         });
+          const $table = document.createElement('table');
+          let turn = 'O'
+          //데이터 갯수 만큼 테이블에 tr td 생성
+          data.forEach((e,i)=>{
+              const $tr = document.createElement('tr');
+              //tr tag 밑에 td 추가
+              e.forEach((e1,i1)=>{
+                const $td = document.createElement('td');
+                $td.id = `${i}_${i1}`;
+                $td.addEventListener('click',(e)=>{
+                    if(!e.target.textContent) {
+                        const x = e.target.id.split('_')[0];
+                        const y = e.target.id.split('_')[0];
+                        const tempX;
+                        const tempY;
+                        
+                        //변수에 데이터저장
+                        data[x][y] = turn;
+                        $td.textContent = data[x][y];
+                        
+                        //컴퓨터 초이스
+                        while(true) {
+                            const tempX = Math.floor(Math.random() * 3);
+                            const tempY = Math.floor(Math.random() * 3);
+                            
+                            if(x !== tempX && y !== tempY) break;
+                        }
+                        data[tempX][tempY] = 'X';
+                        
+                        
+                    }
+                });
+                $tr.append($td);    
+              })
+              // table 안에 tag 추가
+              $table.append($tr);
+          });
+          //마지막에 table을 바디에 추가
+          document.body.append($table);
+        
         </script>
     </body>
 </html>

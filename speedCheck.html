@@ -1,0 +1,94 @@
+<html>
+    <head>
+        <meta charset='utf-8'/>
+        <style>
+            #screen {
+                width : 300px;
+                height : 200px;
+                text-align : center;
+                user-select: none;
+            }
+            #screen.waiting {
+                background-color : aqua;
+            }
+            #screen.ready {
+                background-color : red;
+                color: white;
+            }
+            #screen.now {
+                background-color : greenyellow;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="screen" class="waiting">클릭해서 시작</div>
+        <div id="result"></div>
+        <script>
+            const $screen = document.querySelector("#screen");
+            const $result = document.querySelector("#result");
+            
+            let startTime = 0;
+            let endTime = 0;
+            let records = [];
+            let timeOut;
+            
+            $screen.addEventListener('click',(e)=>{
+                
+                /*
+                    태크.classList.add('클래스') // 추가
+                    태그.classList.replace('기존클래스','수정클래스'); // 수정
+                    태그.classList.remove('클래스'); //제거
+                */
+                switch(e.target.classList[0]) {
+                    case "waiting" :
+                      //$screen.className = "ready";
+                      $screen.classList.replace("waiting","ready");
+                      $screen.textContent = "초록색이 되면 클릭"
+                      
+                      timeOut = setTimeout(()=>{
+                         //시작시간
+                         startTime = new Date();
+                         
+                         $screen.classList.replace("ready","now");
+                         $screen.textContent = "클릭하세요.";
+                         
+                         //시간 체크 시작
+                      },Math.floor(Math.random() * 1000 ) + 2000);
+                      
+                      break;
+                    case "ready" :
+                      clearTimeout(timeOut);
+                      $screen.classList.replace("ready","waiting");
+                      $screen.textContent = "성급하군요 => 클릭해서 재시작";
+                      
+                      break;
+                    case "now" :
+                      //종료시간
+                      endTime = new Date();
+                      
+                      //차이
+                      const currentTime = endTime - startTime;
+                      records.push(currentTime);
+                      $result.textContent = `${currentTime}ms average::${Math.floor(records.reduce((accumulate,e)=>accumulate+e) / records.length)}`;
+                      
+                      let sortRecords = records.slice();
+                      sortRecords.sort((a,b) => a-b).forEach((e,i,arr)=>{
+                          if(i < 5) {
+                               $result.append(document.createElement('br'),`${i+1}위 :: ${e}ms `);
+                          }
+                      })
+                      
+                      //변수초기화
+                      startTime = null;
+                      endTime = null;
+                      
+                      //시간 체크 종료
+                      $screen.classList.replace("now","waiting");
+                      $screen.textContent = "클릭하세요"
+                      
+                      break;
+                }
+            });
+        </script>
+    </body>
+</html>
