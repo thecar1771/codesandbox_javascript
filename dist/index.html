@@ -17,7 +17,45 @@
   return Array(3).fill();
 });
 var $table = document.createElement('table');
-var turn = 'O';
+var humanChoice = function humanChoice(x, y) {
+  data[x][y] = 'O';
+  document.querySelector("td[id=\"".concat(x + '_' + y, "\"]")).textContent = data[x][y];
+};
+var autoComputerChoice = function autoComputerChoice() {
+  var tempX;
+  var tempY;
+  var nullCheck = data.filter(function (e, i) {
+    return e.some(function (ie) {
+      return !ie;
+    });
+  });
+
+  //컴퓨터 초이스
+  while (nullCheck.length > 0) {
+    tempX = Math.floor(Math.random() * 3);
+    tempY = Math.floor(Math.random() * 3);
+    if (!data[tempX][tempY]) {
+      data[tempX][tempY] = 'X';
+      document.querySelector("td[id=\"".concat(tempX + '_' + tempY, "\"]")).textContent = data[tempX][tempY];
+      break;
+    }
+    ;
+  }
+};
+var tdChoice = function tdChoice(turnGubn, x, y) {
+  if (turnGubn === "H") {
+    humanChoice(x, y);
+  } else if (turnGubn === "C") {
+    autoComputerChoice();
+  }
+
+  //승부 체크
+};
+
+function winCheck() {
+  da;
+}
+
 //데이터 갯수 만큼 테이블에 tr td 생성
 data.forEach(function (e, i) {
   var $tr = document.createElement('tr');
@@ -28,13 +66,15 @@ data.forEach(function (e, i) {
     $td.addEventListener('click', function (e) {
       if (!e.target.textContent) {
         var x = e.target.id.split('_')[0];
-        var y = e.target.id.split('_')[0];
+        var y = e.target.id.split('_')[1];
 
-        //변수에 데이터저장
-        data[x][y] = turn;
-        $td.textContent = data[x][y];
+        //사람 초이스 데이터저장
+        tdChoice("H", x, y);
+        tdChoice("C");
+        //승부 체크                         
       }
     });
+
     $tr.append($td);
   });
   // table 안에 tag 추가
