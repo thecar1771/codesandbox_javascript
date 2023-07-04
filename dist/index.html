@@ -13,10 +13,17 @@
             }</style>
     </head>
     <body>
-        <script>var data = Array(3).fill().map(function (e, i) {
+        <script>//구조분해할당
+var _document = document,
+  body = _document.body;
+var arr = [1, 2, 3];
+var one = arr[0],
+  three = arr[2];
+var $table = document.createElement('table');
+var $result = document.createElement('div');
+var data = Array(3).fill().map(function (e, i) {
   return Array(3).fill();
 });
-var $table = document.createElement('table');
 var humanChoice = function humanChoice(x, y) {
   data[x][y] = 'O';
   document.querySelector("td[id=\"".concat(x + '_' + y, "\"]")).textContent = data[x][y];
@@ -50,10 +57,46 @@ var tdChoice = function tdChoice(turnGubn, x, y) {
   }
 
   //승부 체크
+  return winCheck();
 };
-
 function winCheck() {
-  da;
+  var gameOver = false;
+  var check1 = data[0];
+  var check2 = data[1];
+  var check3 = data[2];
+  var check4 = data.map(function (el) {
+    return el[0];
+  });
+  var check5 = data.map(function (el) {
+    return el[1];
+  });
+  var check6 = data.map(function (el) {
+    return el[2];
+  });
+  var xPoint = 0;
+  var check7 = data.map(function (el) {
+    return el[xPoint++];
+  });
+  var yPoint = 2;
+  var check8 = data.map(function (el) {
+    return el[yPoint--];
+  });
+  var checkArrays = Array(check1, check2, check3, check4, check5, check6, check7, check8);
+  checkArrays.forEach(function (el) {
+    if (new Set(el).size === 1) {
+      switch (el[0]) {
+        case 'X':
+          alert("컴퓨터 승리");
+          gameOver = true;
+          break;
+        case 'O':
+          alert("인간 승리");
+          gameOver = true;
+          break;
+      }
+    }
+  });
+  return gameOver;
 }
 
 //데이터 갯수 만큼 테이블에 tr td 생성
@@ -69,18 +112,19 @@ data.forEach(function (e, i) {
         var y = e.target.id.split('_')[1];
 
         //사람 초이스 데이터저장
-        tdChoice("H", x, y);
-        tdChoice("C");
-        //승부 체크                         
+        if (!tdChoice("H", x, y)) {
+          //게임이 안끝났을 때만 컴퓨터 자동 선택
+          tdChoice("C");
+        }
       }
     });
-
     $tr.append($td);
   });
   // table 안에 tag 추가
   $table.append($tr);
 });
 //마지막에 table을 바디에 추가
-document.body.append($table);</script>
+document.body.append($table);
+document.body.append($result);</script>
     </body>
 </html>
