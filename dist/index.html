@@ -31,13 +31,12 @@ var humanChoice = function humanChoice(x, y) {
 var autoComputerChoice = function autoComputerChoice() {
   var tempX;
   var tempY;
-  var nullCheck = data.filter(function (e, i) {
-    return e.some(function (ie) {
-      return !ie;
-    });
-  });
 
-  //컴퓨터 초이스
+  //flat 후 filter 로 체크가 안된걸 찾음
+
+  var nullCheck = data.flat().filter(function (e) {
+    return e === undefined;
+  });
   while (nullCheck.length > 0) {
     tempX = Math.floor(Math.random() * 3);
     tempY = Math.floor(Math.random() * 3);
@@ -48,7 +47,24 @@ var autoComputerChoice = function autoComputerChoice() {
     }
     ;
   }
+
+  // let nullCheck = data.filter((e,i)=>{
+  //     return e.some((ie)=>!ie);
+  // });
+
+  // //컴퓨터 초이스
+  // while(nullCheck.length > 0) {
+  //     tempX = Math.floor(Math.random() * 3);
+  //     tempY = Math.floor(Math.random() * 3);
+
+  //     if(!data[tempX][tempY]) {
+  //         data[tempX][tempY] = 'X';
+  //         document.querySelector(`td[id="${tempX+'_'+tempY}"]`).textContent = data[tempX][tempY];
+  //         break;
+  //     };
+  // }     
 };
+
 var tdChoice = function tdChoice(turnGubn, x, y) {
   if (turnGubn === "H") {
     humanChoice(x, y);
@@ -59,6 +75,15 @@ var tdChoice = function tdChoice(turnGubn, x, y) {
   //승부 체크
   return winCheck();
 };
+
+//승자 체크 할 때 td를 넘겨준다.
+//parameter td 값으로 배열에서 같은 td 를 찾아 rowindex,colindex 를 찾음 
+// td cellindex target.cellIndex // tr target.parentNode.rowIndex
+// Array.from()
+// every() 모두 true => true 하나라도 아니면 false 
+// some () 하나라도 true => true 모두 아니면 false
+
+// not, 문자열의 빈문자열 , undefined, false, null , 0 = 
 function winCheck() {
   var gameOver = false;
   var check1 = data[0];
@@ -82,7 +107,9 @@ function winCheck() {
     return el[yPoint--];
   });
   var checkArrays = Array(check1, check2, check3, check4, check5, check6, check7, check8);
+  var noWin = 0;
   checkArrays.forEach(function (el) {
+    // 승자 체크 
     if (new Set(el).size === 1) {
       switch (el[0]) {
         case 'X':
@@ -95,9 +122,31 @@ function winCheck() {
           break;
       }
     }
+    // 무승부 체크 
+    else if (!el.includes(undefined)) {
+      ++noWin;
+      if (noWin === 8) {
+        alert("무승부");
+        gameOver = true;
+      }
+    }
   });
+  if (gameOver) $table.removeEventListener('click', tdClick);
   return gameOver;
 }
+var tdClick = function tdClick(e) {
+  if (!e.target.textContent) {
+    // 배열에 td 객체를 추가 
+    var x = e.target.id.split('_')[0];
+    var y = e.target.id.split('_')[1];
+
+    //사람 초이스 데이터저장
+    if (!tdChoice("H", x, y)) {
+      //게임이 안끝났을 때만 컴퓨터 자동 선택
+      tdChoice("C");
+    }
+  }
+};
 
 //데이터 갯수 만큼 테이블에 tr td 생성
 data.forEach(function (e, i) {
@@ -106,25 +155,15 @@ data.forEach(function (e, i) {
   e.forEach(function (e1, i1) {
     var $td = document.createElement('td');
     $td.id = "".concat(i, "_").concat(i1);
-    $td.addEventListener('click', function (e) {
-      if (!e.target.textContent) {
-        var x = e.target.id.split('_')[0];
-        var y = e.target.id.split('_')[1];
-
-        //사람 초이스 데이터저장
-        if (!tdChoice("H", x, y)) {
-          //게임이 안끝났을 때만 컴퓨터 자동 선택
-          tdChoice("C");
-        }
-      }
-    });
+    //$td.addEventListener('click',tdClick);
     $tr.append($td);
   });
   // table 안에 tag 추가
   $table.append($tr);
 });
 //마지막에 table을 바디에 추가
+document.body.append($result);
 document.body.append($table);
-document.body.append($result);</script>
+$table.addEventListener('click', tdClick);</script>
     </body>
 </html>
