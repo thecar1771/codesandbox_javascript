@@ -13,157 +13,65 @@
             }</style>
     </head>
     <body>
-        <script>//구조분해할당
+        <script>// 구조 분해 할당
 var _document = document,
   body = _document.body;
-var arr = [1, 2, 3];
-var one = arr[0],
-  three = arr[2];
-var $table = document.createElement('table');
-var $result = document.createElement('div');
-var data = Array(3).fill().map(function (e, i) {
-  return Array(3).fill();
-});
-var humanChoice = function humanChoice(x, y) {
-  data[x][y] = 'O';
-  document.querySelector("td[id=\"".concat(x + '_' + y, "\"]")).textContent = data[x][y];
-};
-var autoComputerChoice = function autoComputerChoice() {
-  var tempX;
-  var tempY;
 
-  //flat 후 filter 로 체크가 안된걸 찾음
+//테이블 생성 및 추가
+$table = document.createElement('table');
+$result = document.createElement('div');
 
-  var nullCheck = data.flat().filter(function (e) {
-    return e === undefined;
-  });
-  while (nullCheck.length > 0) {
-    tempX = Math.floor(Math.random() * 3);
-    tempY = Math.floor(Math.random() * 3);
-    if (!data[tempX][tempY]) {
-      data[tempX][tempY] = 'X';
-      document.querySelector("td[id=\"".concat(tempX + '_' + tempY, "\"]")).textContent = data[tempX][tempY];
-      break;
-    }
-    ;
-  }
+//td function
+var clickCallBack = function clickCallBack(e) {
+  //alert(e.target.cellIndex);
+  //alert(e.target.parentNode.rowIndex);
 
-  // let nullCheck = data.filter((e,i)=>{
-  //     return e.some((ie)=>!ie);
-  // });
-
-  // //컴퓨터 초이스
-  // while(nullCheck.length > 0) {
-  //     tempX = Math.floor(Math.random() * 3);
-  //     tempY = Math.floor(Math.random() * 3);
-
-  //     if(!data[tempX][tempY]) {
-  //         data[tempX][tempY] = 'X';
-  //         document.querySelector(`td[id="${tempX+'_'+tempY}"]`).textContent = data[tempX][tempY];
-  //         break;
-  //     };
-  // }     
-};
-
-var tdChoice = function tdChoice(turnGubn, x, y) {
-  if (turnGubn === "H") {
-    humanChoice(x, y);
-  } else if (turnGubn === "C") {
-    autoComputerChoice();
-  }
-
-  //승부 체크
-  return winCheck();
-};
-
-//승자 체크 할 때 td를 넘겨준다.
-//parameter td 값으로 배열에서 같은 td 를 찾아 rowindex,colindex 를 찾음 
-// td cellindex target.cellIndex // tr target.parentNode.rowIndex
-// Array.from()
-// every() 모두 true => true 하나라도 아니면 false 
-// some () 하나라도 true => true 모두 아니면 false
-
-// not, 문자열의 빈문자열 , undefined, false, null , 0 = 
-function winCheck() {
-  var gameOver = false;
-  var check1 = data[0];
-  var check2 = data[1];
-  var check3 = data[2];
-  var check4 = data.map(function (el) {
-    return el[0];
-  });
-  var check5 = data.map(function (el) {
-    return el[1];
-  });
-  var check6 = data.map(function (el) {
-    return el[2];
-  });
-  var xPoint = 0;
-  var check7 = data.map(function (el) {
-    return el[xPoint++];
-  });
-  var yPoint = 2;
-  var check8 = data.map(function (el) {
-    return el[yPoint--];
-  });
-  var checkArrays = Array(check1, check2, check3, check4, check5, check6, check7, check8);
-  var noWin = 0;
-  checkArrays.forEach(function (el) {
-    // 승자 체크 
-    if (new Set(el).size === 1) {
-      switch (el[0]) {
-        case 'X':
-          alert("컴퓨터 승리");
-          gameOver = true;
-          break;
-        case 'O':
-          alert("인간 승리");
-          gameOver = true;
-          break;
-      }
-    }
-    // 무승부 체크 
-    else if (!el.includes(undefined)) {
-      ++noWin;
-      if (noWin === 8) {
-        alert("무승부");
-        gameOver = true;
-      }
-    }
-  });
-  if (gameOver) $table.removeEventListener('click', tdClick);
-  return gameOver;
-}
-var tdClick = function tdClick(e) {
+  // event bubbling
   if (!e.target.textContent) {
-    // 배열에 td 객체를 추가 
-    var x = e.target.id.split('_')[0];
-    var y = e.target.id.split('_')[1];
+    //사람 클릭 
+    e.target.textContent = 'O';
 
-    //사람 초이스 데이터저장
-    if (!tdChoice("H", x, y)) {
-      //게임이 안끝났을 때만 컴퓨터 자동 선택
-      tdChoice("C");
-    }
+    //컴퓨터 자동 클릭 
+    computerClick(e.target.parentNode.rowIndex, e.target.cellIndex);
   }
 };
 
-//데이터 갯수 만큼 테이블에 tr td 생성
-data.forEach(function (e, i) {
-  var $tr = document.createElement('tr');
-  //tr tag 밑에 td 추가
-  e.forEach(function (e1, i1) {
-    var $td = document.createElement('td');
-    $td.id = "".concat(i, "_").concat(i1);
-    //$td.addEventListener('click',tdClick);
-    $tr.append($td);
+//컴퓨터 자동 클릭
+function computerClick(usedRowIndex, usedCellIndex) {
+  //2차원 배열을 1차원 배열로 변경 후 filter 이용하여 undefined영역을 찾음
+
+  var nullCell = matrix.flat().filter(function (el) {
+    return !el.textContent;
   });
-  // table 안에 tag 추가
+  if (nullCell.length > 0) {
+    var computerUseIndex = Math.floor(Math.random() * nullCell.length);
+    nullCell[computerUseIndex].textContent = 'X';
+  }
+}
+;
+
+//tr,td 이중 배열 생성
+var matrix = Array(3).fill().map(function (outEl, outIndex) {
+  //tr 태그 생성
+  $tr = document.createElement('tr');
+
+  //tr 태그에 td 추가 
+  var trArrs = Array(3).fill().map(function (inEl, inIndex) {
+    //td 태그 설정 
+    $td = document.createElement('td');
+
+    //tr 태그에 td 추가
+    $tr.append($td);
+
+    //$td 배열에 추가
+    return $td;
+  });
+
+  //table tr태그 추가 
   $table.append($tr);
+  return trArrs;
 });
-//마지막에 table을 바디에 추가
-document.body.append($result);
-document.body.append($table);
-$table.addEventListener('click', tdClick);</script>
+$table.addEventListener('click', clickCallBack);
+body.append($table, $result);</script>
     </body>
 </html>
