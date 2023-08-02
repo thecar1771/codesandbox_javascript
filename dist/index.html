@@ -1,77 +1,134 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <style>table {
-                border-collapse : collapse;
-            }
-            
-            td {
-                border: 1px solid black;
-                width : 40px;
-                height : 40px;
-                text-align: center;
-            }</style>
-    </head>
-    <body>
-        <script>// 구조 분해 할당
-var _document = document,
-  body = _document.body;
+  <head>
+    <meta charset="utf-8">
+    <style>
+    </style>
+  </head>
+  <body>
+    <form id="start-screen" style="display:block">
+      <input id="name-input" placeholder="주인공 이름을 입력하세요!">
+      <button id="start">시작</button>
+    </form>
+    <div>
+      <div id="hero-stat">
+        <span id="hero-name"></span>
+        <span id="hero-level"></span>
+        <span id="hero-hp"></span>
+        <span id="hero-xp"></span>
+        <span id="hero-att"></span>
+      </div>
+      <form id="game-menu" style="display: none;">
+        <div id="menu-1">1.모형</div>
+        <div id="menu-2">2.휴식</div>
+        <div id="menu-3">3.종료</div>
+        <input id="menu-input">
+        <button id="menu-button">입력</button>
+      </form>
+      <form id="battle-menu" style="display: none;">
+        <div id="battle-1">1.공격</div>
+        <div id="battle-2">2.회복</div>
+        <div id="battle-3">3.도망</div>
+        <input id="battle-input">
+        <button id="battle-button">입력</button>
+      </form>
+      <div id="message"></div>
+      <div id="monster-stat">
+        <span id="monster-name"></span>
+        <span id="monster-hp"></span>
+        <span id="monster-att"></span>
+      </div>
+    </div>
+    <script>function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+//화면 목록 
+var $startScreen = document.querySelector('#start-screen');
+var $gameMenu = document.querySelector('#game-menu');
+var $battleMenu = document.querySelector('#battle-menu');
+var $heroName = document.querySelector('#hero-name');
 
-//테이블 생성 및 추가
-$table = document.createElement('table');
-$result = document.createElement('div');
+//주인공 정보 
+var $heroLevel = document.querySelector('#hero-level');
+var $heroHp = document.querySelector('#hero-hp');
+var $heroXp = document.querySelector('#hero-xp');
+var $heroAtt = document.querySelector('#hero-att');
 
-//td function
-var clickCallBack = function clickCallBack(e) {
-  //alert(e.target.cellIndex);
-  //alert(e.target.parentNode.rowIndex);
-
-  // event bubbling
-  if (!e.target.textContent) {
-    //사람 클릭 
-    e.target.textContent = 'O';
-
-    //컴퓨터 자동 클릭 
-    computerClick(e.target.parentNode.rowIndex, e.target.cellIndex);
-  }
+//몬스터 정보
+var $monsterName = document.querySelector('#monster-name');
+var $monsterHp = document.querySelector('#monster-hp');
+var $monsterAtt = document.querySelector('#monster-att');
+var hero = {
+  name: '',
+  lev: 1,
+  maxHp: 100,
+  hp: 100,
+  xp: 0,
+  maxXp: 0,
+  att: 10
 };
+var monster = null;
+var monsterList = [{
+  name: '슬라임',
+  hp: 25,
+  att: 10,
+  xp: 10
+}, {
+  name: '스켈레톤',
+  hp: 50,
+  att: 15,
+  xp: 20
+}, {
+  name: '마왕',
+  hp: 150,
+  att: 35,
+  xp: 50
+}];
+$startScreen.addEventListener('submit', function (event) {
+  event.preventDefault();
+  var name = event.target['name-input'].value;
+  $startScreen.style.display = 'none';
+  $gameMenu.style.display = 'block';
 
-//컴퓨터 자동 클릭
-function computerClick(usedRowIndex, usedCellIndex) {
-  //2차원 배열을 1차원 배열로 변경 후 filter 이용하여 undefined영역을 찾음
-
-  var nullCell = matrix.flat().filter(function (el) {
-    return !el.textContent;
-  });
-  if (nullCell.length > 0) {
-    var computerUseIndex = Math.floor(Math.random() * nullCell.length);
-    nullCell[computerUseIndex].textContent = 'X';
-  }
-}
-;
-
-//tr,td 이중 배열 생성
-var matrix = Array(3).fill().map(function (outEl, outIndex) {
-  //tr 태그 생성
-  $tr = document.createElement('tr');
-
-  //tr 태그에 td 추가 
-  var trArrs = Array(3).fill().map(function (inEl, inIndex) {
-    //td 태그 설정 
-    $td = document.createElement('td');
-
-    //tr 태그에 td 추가
-    $tr.append($td);
-
-    //$td 배열에 추가
-    return $td;
-  });
-
-  //table tr태그 추가 
-  $table.append($tr);
-  return trArrs;
+  //주인공 정보 설정 
+  hero.name = name;
+  $heroName.textContent = name;
+  $heroLevel.textContent = "".concat(hero.lev, "Lev");
+  $heroHp.textContent = "HP : ".concat(hero.hp, "/").concat(hero.maxHp);
+  $heroXp.textContent = "XP : ".concat(hero.xp, "/").concat(15 * hero.lev);
+  $heroAtt.textContent = "ATT : ".concat(hero.att);
 });
-$table.addEventListener('click', clickCallBack);
-body.append($table, $result);</script>
-    </body>
+$gameMenu.addEventListener('submit', function (event) {
+  event.preventDefault();
+  var input = event.target['menu-input'].value;
+  if (input === '1') {
+    // 모험
+    $gameMenu.style.display = 'none';
+    $battleMenu.style.display = 'block';
+    monster = JSON.parse(
+    // 깊은 복사 
+    JSON.stringify(mosterList[Math.floor(Math.random() * mosterList.length)]));
+    monster.maxHp = monster.hp;
+    $monsterName.textContent = monster.name;
+    $monsterHp.textContent = "HP : ".concat(monster.hp, "/").concat(monster.maxHp);
+    $monsterAtt.textContent = "ATT : ".concat(monster.att);
+
+    //깊은 복사
+    var monster1 = JSON.parse(JSON.stringify(monsterList[0]));
+    //얕은 복사
+    var monster2 = _objectSpread({}, mosterList[0]); // [ ...args]
+    //참조관계
+    var monster3 = monsterList[0];
+  } else if (input === '2') {// 휴식
+  } else if (input === '3') {// 종료
+  }
+});
+$battleMenu.addEventListener('submit', function (event) {
+  event.preventDefault();
+  var input = event.target['battle-input'].value;
+  if (input === '1') {} else if (input === '2') {} else if (input === '3') {}
+});</script>
+  </body>
 </html>
