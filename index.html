@@ -1,81 +1,135 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <style>
-            table {
-                border-collapse : collapse;
-            }
+  <head>
+    <meta charset="utf-8">
+    <style>
+    </style>
+  </head>
+  <body>
+    <form id="start-screen" style="display:block">
+      <input id="name-input" placeholder="주인공 이름을 입력하세요!" />
+      <button id="start">시작</button>
+    </form>
+    <div>
+      <div id="hero-stat">
+        <span id="hero-name"></span>
+        <span id="hero-level"></span>
+        <span id="hero-hp"></span>
+        <span id="hero-xp"></span>
+        <span id="hero-att"></span>
+      </div>
+      <form id="game-menu" style="display: none;">
+        <div id="menu-1">1.모형</div>
+        <div id="menu-2">2.휴식</div>
+        <div id="menu-3">3.종료</div>
+        <input id="menu-input" />
+        <button id="menu-button">입력</button>
+      </form>
+      <form id="battle-menu" style="display: none;">
+        <div id="battle-1">1.공격</div>
+        <div id="battle-2">2.회복</div>
+        <div id="battle-3">3.도망</div>
+        <input id="battle-input" />
+        <button id="battle-button">입력</button>
+      </form>
+      <div id="message"></div>
+      <div id="monster-stat">
+        <span id="monster-name"></span>
+        <span id="monster-hp"></span>
+        <span id="monster-att"></span>
+      </div>
+    </div>
+    <script>
+      //화면 목록 
+      const $startScreen = document.querySelector('#start-screen');
+      const $gameMenu = document.querySelector('#game-menu');
+      const $battleMenu = document.querySelector('#battle-menu');
+      const $heroName = document.querySelector('#hero-name');
+
+      //주인공 정보 
+      const $heroLevel = document.querySelector('#hero-level');
+      const $heroHp = document.querySelector('#hero-hp');
+      const $heroXp = document.querySelector('#hero-xp');
+      const $heroAtt = document.querySelector('#hero-att');
+
+      //몬스터 정보
+      const $monsterName = document.querySelector('#monster-name');
+      const $monsterHp = document.querySelector('#monster-hp');
+      const $monsterAtt = document.querySelector('#monster-att');
+      
+      const hero = {
+        name : '',
+        lev : 1,
+        maxHp : 100,
+        hp : 100,
+        xp : 0,
+        maxXp : 0,
+        att : 10,
+      }      
+
+      let monster = null;
+      const monsterList = [
+        { name: '슬라임', hp: 25, att: 10, xp: 10 },
+        { name: '스켈레톤', hp: 50, att: 15, xp: 20 },
+        { name: '마왕', hp: 150, att: 35, xp: 50 },
+      ]
+
+      $startScreen.addEventListener('submit', (event) => {
+        event.preventDefault();
+        var name = event.target['name-input'].value;
+        $startScreen.style.display = 'none';
+        $gameMenu.style.display = 'block';
+        
+        //주인공 정보 설정 
+        hero.name = name
+        $heroName.textContent = name;
+        $heroLevel.textContent = `${hero.lev}Lev`;
+        $heroHp.textContent = `HP : ${hero.hp}/${hero.maxHp}`;
+        $heroXp.textContent = `XP : ${hero.xp}/${15 * hero.lev}`;
+        $heroAtt.textContent = `ATT : ${hero.att}`;
+
+      });
+
+      $gameMenu.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const input = event.target['menu-input'].value;
+        if (input === '1') { // 모험
+          $gameMenu.style.display = 'none';
+          $battleMenu.style.display = 'block';
+          monster = JSON.parse(
+            // 깊은 복사 
+            JSON.stringify(mosterList[Math.floor(Math.random() * mosterList.length)])
+          );
+          monster.maxHp = monster.hp;
+          $monsterName.textContent = monster.name;
+          $monsterHp.textContent = `HP : ${monster.hp}/${monster.maxHp}`;
+          $monsterAtt.textContent = `ATT : ${monster.att}`;
+
+          //깊은 복사
+          const monster1 = JSON.parse(JSON.stringify(monsterList[0]));
+          //얕은 복사
+          const monster2 = { ...mosterList[0]} ; // [ ...args]
+          //참조관계
+          const monster3 = monsterList[0];
+
+        } else if (input === '2') { // 휴식
+
+        } else if (input === '3') { // 종료
+
+        } 
+      });
+
+      $battleMenu.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const input = event.target['battle-input'].value;
+        if(input === '1'){
+
+        } else if(input === '2'){
             
-            td {
-                border: 1px solid black;
-                width : 40px;
-                height : 40px;
-                text-align: center;
-            }
-        </style>
-    </head>
-    <body>
-        <script>
-            // 구조 분해 할당
-            const {body} = document;
+        } else if(input === '3'){
             
-            //테이블 생성 및 추가
-            $table = document.createElement('table');
-            $result = document.createElement('div');
-            
-            //td function
-            const clickCallBack = (e) => {
-                //alert(e.target.cellIndex);
-                //alert(e.target.parentNode.rowIndex);
-                
-                // event bubbling
-                if(!e.target.textContent) {
-                    //사람 클릭 
-                    e.target.textContent = 'O';
-                    
-                    //컴퓨터 자동 클릭 
-                    computerClick(e.target.parentNode.rowIndex,e.target.cellIndex);
-                }
-            }
-            
-            //컴퓨터 자동 클릭
-            function computerClick(usedRowIndex,usedCellIndex) {
-                //2차원 배열을 1차원 배열로 변경 후 filter 이용하여 undefined영역을 찾음
-                
-                const nullCell = matrix.flat().filter(el=>!el.textContent);
-                if(nullCell.length > 0) {
-                    const computerUseIndex = Math.floor(Math.random() * nullCell.length);
-                    nullCell[computerUseIndex].textContent = 'X';
-                }
-                
-            };
-            
-            //tr,td 이중 배열 생성
-            const matrix = Array(3).fill().map((outEl,outIndex)=>{
-                //tr 태그 생성
-                $tr = document.createElement('tr');
-                
-                //tr 태그에 td 추가 
-                const trArrs = Array(3).fill().map((inEl,inIndex)=>{
-                   //td 태그 설정 
-                   $td = document.createElement('td');
-                   
-                   //tr 태그에 td 추가
-                   $tr.append($td);
-                   
-                   //$td 배열에 추가
-                   return $td; 
-                });
-                
-                //table tr태그 추가 
-                $table.append($tr);
-                
-                return trArrs;
-            });
-            
-            $table.addEventListener('click',clickCallBack);
-            body.append($table,$result);
-            
-        </script>
-    </body>
+        }
+
+      });
+    </script>
+  </body>
 </html>
