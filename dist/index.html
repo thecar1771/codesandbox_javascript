@@ -27,7 +27,7 @@
   }
 
   .card-front {
-    backgroud: navy;
+    background: navy;
   }
   
   .card-front, .card-back {
@@ -49,6 +49,8 @@ var total = 12;
 var colors = ['red', 'orange', 'yellow', 'green', 'white', 'pink'];
 var colorCopy = colors.concat(colors);
 var shuffled = [];
+var clicked = [];
+var completed = [];
 function shuffle() {
   //피셔에이츠 셔플
   for (var i = 0; colorCopy.length > 0; ++i) {
@@ -57,6 +59,7 @@ function shuffle() {
   }
 }
 function createCard(i) {
+  // div.card > div.card-inner > ( div.card-front + div.card-back)
   var card = document.createElement('div');
   card.className = 'card'; // .card 태그 생성
   var cardInner = document.createElement('div');
@@ -65,5 +68,60 @@ function createCard(i) {
   cardFront.className = 'card-front';
   var cardBack = document.createElement('div');
   cardBack.className = 'card-back';
-}</script>  
+  cardBack.style.backgroundColor = shuffled[i];
+  cardInner.appendChild(cardFront);
+  cardInner.appendChild(cardBack);
+  card.appendChild(cardInner);
+  return card;
+}
+// scope function 일 경우 this === event 가 됨
+// onclick event 가 => 함수 일 경우 this === window 가 됨
+function onclickCard() {
+  this.classList.toggle('flipped');
+  clicked.push(this);
+  if (clicked.length !== 2) {
+    return;
+  }
+  var firstCard = clicked[0].querySelector('.card-back').style.backgroundColor;
+  var secondCard = clicked[1].querySelector('.card-back').style.backgroundColor;
+  if (firstCard === secondCard) {
+    // completed.push(clicked[0]);
+    // completed.push(clicked[1]);
+    // clicked = [];
+    // return ;
+    completed = completed.concat(clicked);
+    if (completed.length !== total) {
+      return;
+    }
+    return;
+  }
+  setTimeout(function () {
+    clicked[0].classList.remove('flipped');
+    clicked[1].classList.remove('flipped');
+    clicked = [];
+  }, 1000);
+}
+function startGame() {
+  shuffle();
+  for (var i = 0; i < total; i += 1) {
+    var card = createCard(i);
+    card.addEventListener('click', onclickCard);
+    $wrapper.appendChild(card);
+  }
+
+  //뒤집히는 효과 
+  document.querySelectorAll('.card').forEach(function (card, index) {
+    setTimeout(function () {
+      card.classList.add('flipped');
+    }, 1000 + 100 * index);
+  });
+
+  //뒤집히는 효과  5초뒤 제거 
+  setTimeout(function () {
+    document.querySelectorAll('.card').forEach(function (card) {
+      card.classList.remove('flipped');
+    });
+  }, 5000);
+}
+startGame();</script>  
 </body></html>
