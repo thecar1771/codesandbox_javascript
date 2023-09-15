@@ -51,6 +51,7 @@ var colorCopy = colors.concat(colors);
 var shuffled = [];
 var clicked = [];
 var completed = [];
+var clickable = false;
 function shuffle() {
   //피셔에이츠 셔플
   for (var i = 0; colorCopy.length > 0; ++i) {
@@ -77,6 +78,7 @@ function createCard(i) {
 // scope function 일 경우 this === event 가 됨
 // onclick event 가 => 함수 일 경우 this === window 가 됨
 function onclickCard() {
+  if (!clickable) return;
   this.classList.toggle('flipped');
   clicked.push(this);
   if (clicked.length !== 2) {
@@ -93,15 +95,23 @@ function onclickCard() {
     if (completed.length !== total) {
       return;
     }
+
+    // setTimeout(() => {
+    //   alert("축하합니다.");
+
+    //   if(confirm("재시작?")) resetGame();
+    // }, 1000);
+
     return;
   }
   setTimeout(function () {
     clicked[0].classList.remove('flipped');
     clicked[1].classList.remove('flipped');
     clicked = [];
-  }, 1000);
+  }, 100);
 }
 function startGame() {
+  clickable = false;
   shuffle();
   for (var i = 0; i < total; i += 1) {
     var card = createCard(i);
@@ -120,8 +130,16 @@ function startGame() {
   setTimeout(function () {
     document.querySelectorAll('.card').forEach(function (card) {
       card.classList.remove('flipped');
+      clickable = true;
     });
   }, 5000);
 }
-startGame();</script>  
+startGame();
+function resetGame() {
+  $wrapper.innerHTML = '';
+  colorCopy = colors.concat(colors);
+  shuffled = [];
+  completed = [];
+  startGame();
+}</script>  
 </body></html>
