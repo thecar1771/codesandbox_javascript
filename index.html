@@ -1,163 +1,92 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
   <title></title>
+  <meta charset = 'utf-8'/>
   <style>
-   .card{
-    display: inline-block;
-    margin-right : 20px;
-    margin-bottom : 20px;
-    width : 70px;
-    height : 100px;
-    perspective : 140px;
-  }
-
-  .card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    text-align : center;
-    transition : transform 0.8s;
-    transform-style : preserve-3d;
-
-  }
-
-  .card.flipped .card-inner {
-    transform: rotateY(180deg);
-  }
-
-  .card-front {
-    background: navy;
-  }
-  
-  .card-front, .card-back {
-    position: absolute;
-    width : 100%;
-    height : 100%;
-    border : 1px solid black;
-    backface-visibility : hidden;
-  }
-
-  .card-back {
-    transform : rotateY(180deg);
-  }
+    table {
+      border-collapse: collapse;
+    }
+    td {
+      border : 1px solid #bbb;
+      text-align : center;
+      line-height : 20px;
+      width : 20px;
+      height : 20px;
+      background : #888;
+    }
+    td.opened { background: white;}
+    td.flag { background : red;}
+    td.quetion { background : orange; }
   </style>
 </head>
 <body>
-  <div id="wrapper"> </div>
-  <script>
-    const $wrapper = document.querySelector('div[id="wrapper"]');
-    
-    const total = 12;
-    const colors = ['red','orange','yellow','green','white','pink'];
-    let colorCopy = colors.concat(colors);
-    let shuffled = [];
-    let clicked = [];
-    let completed = [];
-    let clickable = false;
+<table id="table">
+  <tbody>
+  </tbody>
+</table>
+<div id="result"></div>
 
-    function shuffle() { //피셔에이츠 셔플
-        for(let i = 0; colorCopy.length > 0; ++i){
-          const  randomIndex = Math.floor(Math.random() * colorCopy.length);
-          shuffled = shuffled.concat(colorCopy.splice(randomIndex,1));
-        }
+<script>
+const $tbody = document.querySelector('#table tbody');
+const $result = document.querySelector('#result');
+const row = 10; // 
+const cell = 10; 
+const mine = 10;
+const CODE = {
+  NORMAL : -1,
+  QUESTION : -2,
+  FLAG : -3,
+  QUESTION_MINE : -4,
+  FLAG_MINE : -5,
+  MINE: -6,
+  OPENED : 0,
+}
+let data;
+
+function plantMine() {
+  //테이블 판 생성
+  const candidate = Array(row * cell).fill().map((arr,i) => {
+    return i;
+  });
+
+  const shuffle = [];      
+  while (candidate.length > row * cell - mine) {
+   const chosen = candidate.splice(Math.floor(Math.random() * candidate.length), 1)[0];
+   shuffle.push(chosen); 
+  }
+
+  const data = [];
+  for(let i = 0; i < row; ++i){
+    const rowData = [];
+    data.push(rowData);
+
+    for (let j = 0; j < cell; ++j) {
+      rowData.push(CODE.NORMAL);
     }
+  }
 
-    function createCard(i) { // div.card > div.card-inner > ( div.card-front + div.card-back)
-      const card = document.createElement('div');
-      card.className = 'card'; // .card 태그 생성
-      const cardInner = document.createElement('div');
-      cardInner.className = 'card-inner';
-      const cardFront = document.createElement('div');
-      cardFront.className = 'card-front';
-      const cardBack = document.createElement('div');
-      cardBack.className = 'card-back';
+}
 
-      cardBack.style.backgroundColor = shuffled[i];
-      cardInner.appendChild(cardFront);
-      cardInner.appendChild(cardBack);
-      card.appendChild(cardInner);
-
-      return card;
-    }
-    // scope function 일 경우 this === event 가 됨
-    // onclick event 가 => 함수 일 경우 this === window 가 됨
-    function onclickCard() {
-
-      if(!clickable) return;
-
-      this.classList.toggle('flipped');
-      clicked.push(this);
-      if(clicked.length !== 2) {
-        return;
+function drawTable() {
+  data = plantMine();
+  
+  data.forEach((rows) => {
+    const $tr = document.createElement('tr');
+    rows.forEach((cell) => {
+      const $td = document.createElement('td');
+      if( cell === CODE.MINE) {
+        $td.textContent = 'X'; 
       }
+      $td.textContent = '0'; 
+      $tr.append($td);
+    });
+    $tbody.append($tr);
+  })
+}
 
-      const firstCard = clicked[0].querySelector('.card-back').style.backgroundColor;
-      const secondCard = clicked[1].querySelector('.card-back').style.backgroundColor;
+drawTable();
 
-      if(firstCard === secondCard) {
-        // completed.push(clicked[0]);
-        // completed.push(clicked[1]);
-        // clicked = [];
-        // return ;
-        completed = completed.concat(clicked); 
-        
-        if(completed.length !== total){
-            return;
-        }
-        
-        // setTimeout(() => {
-        //   alert("축하합니다.");
-
-        //   if(confirm("재시작?")) resetGame();
-        // }, 1000);
-
-        return;
-      }
-
-      setTimeout(()=>{
-        clicked[0].classList.remove('flipped');
-        clicked[1].classList.remove('flipped');
-        clicked = [];
-      },100);      
-    }
-
-    function startGame() {
-      clickable = false; 
-
-      shuffle();
-      for (let i = 0; i < total; i += 1) {
-        const card = createCard(i);
-        card.addEventListener('click',onclickCard);
-        $wrapper.appendChild(card);
-      }
-
-      //뒤집히는 효과 
-      document.querySelectorAll('.card').forEach((card,index) => {
-        setTimeout(() => {
-          card.classList.add('flipped');
-        }, 1000 + 100 * index);
-      });
-
-      //뒤집히는 효과  5초뒤 제거 
-      setTimeout(() => {
-        document.querySelectorAll('.card').forEach((card)=>{
-          card.classList.remove('flipped');
-          clickable = true;
-        });
-      }, 5000);
-    }
-
-    startGame();
-
-    function resetGame(){
-      $wrapper.innerHTML = '';
-      colorCopy = colors.concat(colors);
-      shuffled = [];
-      completed = [];
-      startGame();
-    }
-
-  </script>  
+</script>
 </body>
+</html>

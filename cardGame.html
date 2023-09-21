@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title></title>
+  <style>
+   .card{
+    display: inline-block;
+    margin-right : 20px;
+    margin-bottom : 20px;
+    width : 70px;
+    height : 100px;
+    perspective : 140px;
+  }
+
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align : center;
+    transition : transform 0.8s;
+    transform-style : preserve-3d;
+
+  }
+
+  .card.flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .card-front {
+    background: navy;
+  }
+  
+  .card-front, .card-back {
+    position: absolute;
+    width : 100%;
+    height : 100%;
+    border : 1px solid black;
+    backface-visibility : hidden;
+  }
+
+  .card-back {
+    transform : rotateY(180deg);
+  }
+  </style>
+</head>
+<body>
+  <div id="wrapper"> </div>
+  <script>
+    const $wrapper = document.querySelector('div[id="wrapper"]');
+    
+    const total = 12;
+    const colors = ['red','orange','yellow','green','white','pink'];
+    let colorCopy = colors.concat(colors);
+    let shuffled = [];
+    let clicked = [];
+    let completed = [];
+    let clickable = false;
+
+    function shuffle() { //피셔에이츠 셔플
+        for(let i = 0; colorCopy.length > 0; ++i){
+          const  randomIndex = Math.floor(Math.random() * colorCopy.length);
+          shuffled = shuffled.concat(colorCopy.splice(randomIndex,1));
+        }
+    }
+
+    function createCard(i) { // div.card > div.card-inner > ( div.card-front + div.card-back)
+      const card = document.createElement('div');
+      card.className = 'card'; // .card 태그 생성
+      const cardInner = document.createElement('div');
+      cardInner.className = 'card-inner';
+      const cardFront = document.createElement('div');
+      cardFront.className = 'card-front';
+      const cardBack = document.createElement('div');
+      cardBack.className = 'card-back';
+
+      cardBack.style.backgroundColor = shuffled[i];
+      cardInner.appendChild(cardFront);
+      cardInner.appendChild(cardBack);
+      card.appendChild(cardInner);
+
+      return card;
+    }
+    // scope function 일 경우 this === event 가 됨
+    // onclick event 가 => 함수 일 경우 this === window 가 됨
+    function onclickCard() {
+
+      if(!clickable) return;
+
+      this.classList.toggle('flipped');
+      clicked.push(this);
+      if(clicked.length !== 2) {
+        return;
+      }
+
+      const firstCard = clicked[0].querySelector('.card-back').style.backgroundColor;
+      const secondCard = clicked[1].querySelector('.card-back').style.backgroundColor;
+
+      if(firstCard === secondCard) {
+        // completed.push(clicked[0]);
+        // completed.push(clicked[1]);
+        // clicked = [];
+        // return ;
+        completed = completed.concat(clicked); 
+        
+        if(completed.length !== total){
+            return;
+        }
+        
+        // setTimeout(() => {
+        //   alert("축하합니다.");
+
+        //   if(confirm("재시작?")) resetGame();
+        // }, 1000);
+
+        return;
+      }
+
+      setTimeout(()=>{
+        clicked[0].classList.remove('flipped');
+        clicked[1].classList.remove('flipped');
+        clicked = [];
+      },900);      
+    }
+
+    function startGame() {
+      clickable = false; 
+
+      shuffle();
+      for (let i = 0; i < total; i += 1) {
+        const card = createCard(i);
+        card.addEventListener('click',onclickCard);
+        $wrapper.appendChild(card);
+      }
+
+      //뒤집히는 효과 
+      document.querySelectorAll('.card').forEach((card,index) => {
+        setTimeout(() => {
+          card.classList.add('flipped');
+        }, 1000 + 100 * index);
+      });
+
+      //뒤집히는 효과  5초뒤 제거 
+      setTimeout(() => {
+        document.querySelectorAll('.card').forEach((card)=>{
+          card.classList.remove('flipped');
+          clickable = true;
+        });
+      }, 5000);
+    }
+
+    startGame();
+
+    function resetGame(){
+      $wrapper.innerHTML = '';
+      colorCopy = colors.concat(colors);
+      shuffled = [];
+      completed = [];
+      startGame();
+    }
+
+  </script>  
+</body>
