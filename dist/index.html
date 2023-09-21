@@ -25,7 +25,7 @@
 </table>
 <div id="result"></div>
 
-<script>var $tbody = document.querySelector('#table tbody');
+<script>var $tbody = document.querySelector('#table>tbody');
 var $result = document.querySelector('#result');
 var row = 10; // 
 var cell = 10;
@@ -58,6 +58,101 @@ function plantMine() {
       rowData.push(CODE.NORMAL);
     }
   }
+
+  //shuffle = [85,19,9]
+  for (var k = 0; k < shuffle.length; ++k) {
+    var ver = Math.floor(shuffle[k] / cell);
+    var hor = shuffle[k] % cell;
+    data[ver][hor] = CODE.MINE;
+  }
+  return data;
+}
+function countMine(rowIndex, cellIndex) {
+  var mineCount = 0;
+  var aroundArray = data.slice(rowIndex - 1 < 0 ? 0 : rowIndex - 1, rowIndex + 2);
+  aroundArray.forEach(function (array, index, _) {
+    mineCount += array.slice(cellIndex - 1 < 0 ? 0 : cellIndex - 1, cellIndex + 2).filter(function (v) {
+      return v === CODE.MINE;
+    }).length;
+  });
+
+  //const firstRowMine = aroundArray[0].slice(cellIndex-1,cellIndex+2).filter((v) => v === CODE.MINE).length;
+  //const secondRowMine = aroundArray[1].slice(cellIndex-1,cellIndex+2).filter((v) => v === CODE.MINE).length;
+  //const thirdRowMine = aroundArray[2].slice(cellIndex-1,cellIndex+2).filter((v) => v === CODE.MINE).length;
+
+  return mineCount;
+}
+function onLeftClick(event) {
+  event.preventDefault();
+  var target = event.target;
+  var rowIndex = target.parentNode.rowIndex;
+  var cellIndex = target.cellIndex;
+  var cellData = data[rowIndex][cellIndex];
+  if (cellData === CODE.NORMAL) {
+    var count = countMine(rowIndex, cellIndex);
+    target.textContent = count || '';
+    target.className = 'opened';
+  } else if (cellData === CODE.MINE) {}
+}
+function onRightClick(event) {
+  event.preventDefault();
+  var target = event.target;
+  var rowIndex = target.parentNode.rowIndex; // tr
+  var cellIndex = target.cellIndex; //td
+  var cellData = data[rowIndex][cellIndex];
+
+  /*
+  const CODE = {
+    NORMAL : -1,
+    QUESTION : -2,
+    FLAG : -3,
+    QUESTION_MINE : -4,
+    FLAG_MINE : -5,
+    MINE: -6,
+    OPENED : 0,
+  }
+  */
+  switch (cellData) {
+    //지뢰 일 경우 깃발 구분
+    case CODE.MINE:
+      // 지뢰면
+      data[rowIndex][cellIndex] = CODE.QUESTION_MINE; // 물음표 지뢰로
+      target.className = 'quetion';
+      target.textContent = '?';
+      break;
+    case CODE.QUESTION_MINE:
+      // 물음표 지뢰면
+      data[rowIndex][cellIndex] = CODE.FLAG_MINE; // 깃발 지뢰로
+      target.className = 'flag';
+      target.textContent = '!';
+      break;
+    case CODE.FLAG_MINE:
+      // 깃발 지뢰면  
+      data[rowIndex][cellIndex] = CODE.MINE;
+      target.className = '';
+      target.textContent = 'X';
+      break;
+
+    //지뢰가 아닐 경우 깃발 구분 
+    case CODE.NORMAL:
+      // 지뢰 아니면
+      data[rowIndex][cellIndex] = CODE.QUESTION; // 물음표 지뢰로
+      target.className = 'quetion';
+      target.textContent = '?';
+      break;
+    case CODE.QUESTION:
+      // 물음표 지뢰 아니면
+      data[rowIndex][cellIndex] = CODE.FLAG; // 깃발 지뢰로
+      target.className = 'flag';
+      target.textContent = '!';
+      break;
+    case CODE.FLAG:
+      // 깃발 지뢰 아니면
+      data[rowIndex][cellIndex] = CODE.NORMAL;
+      target.className = '';
+      target.textContent = '';
+      break;
+  }
 }
 function drawTable() {
   data = plantMine();
@@ -67,11 +162,14 @@ function drawTable() {
       var $td = document.createElement('td');
       if (cell === CODE.MINE) {
         $td.textContent = 'X';
+      } else {
+        //$td.textContent = '0'; 
       }
-      $td.textContent = '0';
       $tr.append($td);
     });
     $tbody.append($tr);
+    $tbody.addEventListener('contextmenu', onRightClick);
+    $tbody.addEventListener('click', onLeftClick);
   });
 }
 drawTable();</script>
