@@ -30,9 +30,9 @@
 <script>
 const $tbody = document.querySelector('#table>tbody');
 const $result = document.querySelector('#result');
-const row = 10; // 
-const cell = 10; 
-const mine = 10;
+const row = 20; // 
+const cell = 20; 
+const mine = 60;
 const CODE = {
   NORMAL : -1,
   QUESTION : -2,
@@ -43,6 +43,7 @@ const CODE = {
   OPENED : 0,
 }
 let data;
+let openCount = 0;
 
 function plantMine() {
   //테이블 판 생성
@@ -79,17 +80,47 @@ function plantMine() {
 function countMine(rowIndex,cellIndex) {
   let mineCount = 0;             
   const aroundArray = data.slice((rowIndex-1 < 0 ? 0 : rowIndex-1),rowIndex+2);
-  
   aroundArray.forEach((array,index,_)=>{
-    mineCount += array.slice((cellIndex-1 < 0 ? 0 : cellIndex-1),cellIndex+2).filter((v) => v === CODE.MINE).length;
+    mineCount += array.slice((cellIndex-1 < 0 ? 0 : cellIndex-1),cellIndex+2)
+                      .filter((v) => v === CODE.MINE)
+                      .length;
   });
-
-  //const firstRowMine = aroundArray[0].slice(cellIndex-1,cellIndex+2).filter((v) => v === CODE.MINE).length;
-  //const secondRowMine = aroundArray[1].slice(cellIndex-1,cellIndex+2).filter((v) => v === CODE.MINE).length;
-  //const thirdRowMine = aroundArray[2].slice(cellIndex-1,cellIndex+2).filter((v) => v === CODE.MINE).length;
 
   return mineCount;
 }
+
+function open(rowIndex, cellIndex) {
+  if(data[rowIndex]?.[cellIndex] >= CODE.OPENED) return;
+  
+  const target = $tbody.children[rowIndex]?.children[cellIndex];
+  if(!target) return;
+
+  const count = countMine(rowIndex, cellIndex);
+  target.textContent = count ?? '';
+  target.className = 'opened';
+  data[rowIndex][cellIndex] = count;
+  ++openCount;
+
+  console.log(openCount);
+  return count;
+}
+
+function openAround(rowIndex, cellIndex) {
+  setTimeout(() => {
+    const count = open(rowIndex, cellIndex);
+
+    if(count === 0 ){
+      openAround(rowIndex - 1, cellIndex -1);
+      openAround(rowIndex - 1, cellIndex );
+      openAround(rowIndex - 1, cellIndex +1);
+      openAround(rowIndex , cellIndex -1);
+      openAround(rowIndex , cellIndex +1);
+      openAround(rowIndex + 1, cellIndex -1);
+      openAround(rowIndex + 1, cellIndex );
+      openAround(rowIndex + 1, cellIndex +1);
+    }
+  }, 0);
+};
 
 function onLeftClick(event) {
   event.preventDefault();
@@ -99,11 +130,15 @@ function onLeftClick(event) {
   const cellData = data[rowIndex][cellIndex];
 
   if (cellData === CODE.NORMAL) {
-    const count = countMine(rowIndex, cellIndex);
-    target.textContent = count || '';
-    target.className = 'opened';
+    //const count = countMine(rowIndex, cellIndex);
+    //target.textContent = count ?? '';
+    //target.className = 'opened';
+    openAround(rowIndex,cellIndex);
   } else if (cellData === CODE.MINE) {
-
+    target.textContent = '펑';
+    target.className = 'opened';
+    $tbody.removeEventListener('contextmenu',onRightClick);
+    $tbody.removeEventListener('click',onLeftClick);
   }
 }
 
