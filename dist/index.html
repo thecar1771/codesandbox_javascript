@@ -27,9 +27,9 @@
 
 <script>var $tbody = document.querySelector('#table>tbody');
 var $result = document.querySelector('#result');
-var row = 10; // 
-var cell = 10;
-var mine = 10;
+var row = 20; // 
+var cell = 20;
+var mine = 60;
 var CODE = {
   NORMAL: -1,
   QUESTION: -2,
@@ -40,6 +40,7 @@ var CODE = {
   OPENED: 0
 };
 var data;
+var openCount = 0;
 function plantMine() {
   //테이블 판 생성
   var candidate = Array(row * cell).fill().map(function (arr, i) {
@@ -75,13 +76,37 @@ function countMine(rowIndex, cellIndex) {
       return v === CODE.MINE;
     }).length;
   });
-
-  //const firstRowMine = aroundArray[0].slice(cellIndex-1,cellIndex+2).filter((v) => v === CODE.MINE).length;
-  //const secondRowMine = aroundArray[1].slice(cellIndex-1,cellIndex+2).filter((v) => v === CODE.MINE).length;
-  //const thirdRowMine = aroundArray[2].slice(cellIndex-1,cellIndex+2).filter((v) => v === CODE.MINE).length;
-
   return mineCount;
 }
+function open(rowIndex, cellIndex) {
+  var _data$rowIndex, _$tbody$children$rowI;
+  if (((_data$rowIndex = data[rowIndex]) === null || _data$rowIndex === void 0 ? void 0 : _data$rowIndex[cellIndex]) >= CODE.OPENED) return;
+  var target = (_$tbody$children$rowI = $tbody.children[rowIndex]) === null || _$tbody$children$rowI === void 0 ? void 0 : _$tbody$children$rowI.children[cellIndex];
+  if (!target) return;
+  var count = countMine(rowIndex, cellIndex);
+  target.textContent = count !== null && count !== void 0 ? count : '';
+  target.className = 'opened';
+  data[rowIndex][cellIndex] = count;
+  ++openCount;
+  console.log(openCount);
+  return count;
+}
+function openAround(rowIndex, cellIndex) {
+  setTimeout(function () {
+    var count = open(rowIndex, cellIndex);
+    if (count === 0) {
+      openAround(rowIndex - 1, cellIndex - 1);
+      openAround(rowIndex - 1, cellIndex);
+      openAround(rowIndex - 1, cellIndex + 1);
+      openAround(rowIndex, cellIndex - 1);
+      openAround(rowIndex, cellIndex + 1);
+      openAround(rowIndex + 1, cellIndex - 1);
+      openAround(rowIndex + 1, cellIndex);
+      openAround(rowIndex + 1, cellIndex + 1);
+    }
+  }, 0);
+}
+;
 function onLeftClick(event) {
   event.preventDefault();
   var target = event.target;
@@ -89,10 +114,16 @@ function onLeftClick(event) {
   var cellIndex = target.cellIndex;
   var cellData = data[rowIndex][cellIndex];
   if (cellData === CODE.NORMAL) {
-    var count = countMine(rowIndex, cellIndex);
-    target.textContent = count || '';
+    //const count = countMine(rowIndex, cellIndex);
+    //target.textContent = count ?? '';
+    //target.className = 'opened';
+    openAround(rowIndex, cellIndex);
+  } else if (cellData === CODE.MINE) {
+    target.textContent = '펑';
     target.className = 'opened';
-  } else if (cellData === CODE.MINE) {}
+    $tbody.removeEventListener('contextmenu', onRightClick);
+    $tbody.removeEventListener('click', onLeftClick);
+  }
 }
 function onRightClick(event) {
   event.preventDefault();
