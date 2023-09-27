@@ -21,6 +21,15 @@
   </style>
 </head>
 <body>
+<form id="form">
+  <input placeholder="가로 줄" id="row" size="5" />
+  <input placeholder="세로 줄" id="cell" size="5" />
+  <input placeholder="지뢰" id="mine" size="5" />
+  <button>생성</button>
+</form>
+
+<div id="time">0초</div>
+
 <table id="table">
   <tbody>
   </tbody>
@@ -28,11 +37,16 @@
 <div id="result"></div>
 
 <script>
+const dev = false;
+const $form  = document.querySelector('#form');
 const $tbody = document.querySelector('#table>tbody');
 const $result = document.querySelector('#result');
-const row = 20; // 
-const cell = 20; 
-const mine = 60;
+const $time = document.querySelector('#time');
+let row = 20; // 
+let cell = 20; 
+let mine = 60;
+let interval ;
+let firstClick = false;
 const CODE = {
   NORMAL : -1,
   QUESTION : -2,
@@ -44,6 +58,29 @@ const CODE = {
 }
 let data;
 let openCount = 0;
+function onSubmint(event) {
+  event.preventDefault();
+
+  const data = event.target;
+  row = parseInt(data.row.value);
+  cell = parseInt(data.cell.value);
+  mine = parseInt(data.mine.value);
+
+  $tbody.innerHTML =  '';
+
+  drawTable();
+  
+  clearInterval(interval);
+  $time.textContent = `0초`;
+
+  const startTime = new Date();
+  interval = setInterval(() => {
+    const time = Math.floor((new Date() - startTime) / 1000);
+    $time.textContent = `${time}초`;
+  }, 1000)
+}
+$form.addEventListener('submit',onSubmint);
+
 
 function plantMine() {
   //테이블 판 생성
@@ -122,12 +159,33 @@ function openAround(rowIndex, cellIndex) {
   }, 0);
 };
 
+function mineCheck(rowIndex,cellIndex,value) {
+  if(value !== CODE.MINE) return;
+
+  //1. 주변 테두리 array 추출
+  //2. 주변 테두리 빈공간 확인 > 3.빈공간이 있을 경우 값 마인 옮김 && 함수 종료
+  //4. 주변 테두리 빈공간 없을 경우 > 5. 주변테두리의 주변 테두리 빈공간 확인
+  //5. 주변 테두리 중 빈공간이 있을 경우 옮기고 종료 
+
+  const rowRange = new Set(Array((rowIndex-1 < 0 ? 0 : rowIndex-1),rowIndex,rowIndex+1));
+  const cellRange = new Set(Array((cellIndex-1 < 0 ? 0 : cellIndex-1),cellIndex,cellIndex+1));
+  const dataRange = rowRang;
+
+}
+
 function onLeftClick(event) {
   event.preventDefault();
   const target = event.target;
   const rowIndex = target.parentNode.rowIndex;
   const cellIndex = target.cellIndex;
   const cellData = data[rowIndex][cellIndex];
+
+  //첫 클릭이 지뢰일 경우 지뢰 위치를 옮겨준다. 
+  if(!firstClick) {
+    firstClick = true;
+    //mine Check
+    mineCheck(rowIndex,cellIndex,cellData);
+  }
 
   if (cellData === CODE.NORMAL) {
     //const count = countMine(rowIndex, cellIndex);
@@ -139,6 +197,8 @@ function onLeftClick(event) {
     target.className = 'opened';
     $tbody.removeEventListener('contextmenu',onRightClick);
     $tbody.removeEventListener('click',onLeftClick);
+
+    clearInterval(interval);
   }
 }
 
@@ -212,7 +272,7 @@ function drawTable() {
     rows.forEach((cell) => {
       const $td = document.createElement('td');
       if( cell === CODE.MINE) {
-        $td.textContent = 'X'; 
+        dev && ($td.textContent = 'X');
       } else {
         //$td.textContent = '0'; 
       }
@@ -224,7 +284,6 @@ function drawTable() {
   })
 }
 
-drawTable();
 
 </script>
 </body>
